@@ -19,7 +19,7 @@ class AppConstants {
   /// - Android Emulator: Tự động chuyển localhost/127.0.0.1 sang 10.0.2.2:5000/api
   /// - Thiết bị thật: IP mạng LAN do cấu hình trong .env hoặc _customBaseUrl
   static String get baseUrl {
-    String url = 'http://localhost:5000/api';
+    String url = 'https://libiog4.onrender.com/api';
 
     if (_customBaseUrl != null && _customBaseUrl!.trim().isNotEmpty) {
       url = _customBaseUrl!.trim();
