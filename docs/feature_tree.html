@@ -1,0 +1,852 @@
+<title>Library Feature Tree</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  :root {
+    --bg-page: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-alt: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --border: #e2e8f0;
+    --border-focus: #3b82f6;
+    --primary: #4f46e5;
+    --primary-bg: #eef2ff;
+    --accent: #0284c7;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg-page: #0b1120;
+      --bg-surface: #1e293b;
+      --bg-surface-alt: #0f172a;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --border: #334155;
+      --border-focus: #60a5fa;
+      --primary: #818cf8;
+      --primary-bg: #312e81;
+      --accent: #38bdf8;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg-page: #0b1120;
+    --bg-surface: #1e293b;
+    --bg-surface-alt: #0f172a;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border: #334155;
+    --border-focus: #60a5fa;
+    --primary: #818cf8;
+    --primary-bg: #312e81;
+    --accent: #38bdf8;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Header banner */
+  .header-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .title-area h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  .title-area p {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .badge-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background-color: var(--primary-bg);
+    color: var(--primary);
+  }
+
+  /* Navigation Bar */
+  .tab-bar {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn:hover {
+    background-color: var(--bg-surface-alt);
+    color: var(--text-primary);
+  }
+
+  .tab-btn.active {
+    background-color: var(--primary);
+    color: #ffffff;
+  }
+
+  /* Content Cards */
+  .panel {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .panel-header h2 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .svg-viewport {
+    background-color: var(--bg-surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: auto;
+    max-height: 850px;
+    padding: 16px;
+  }
+
+  .svg-viewport img,
+  .svg-viewport svg {
+    display: block;
+    min-width: 1100px;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Traceability Table */
+  .table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+
+  th {
+    background-color: var(--bg-surface-alt);
+    color: var(--text-primary);
+    font-weight: 700;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    vertical-align: top;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background-color: var(--bg-surface-alt);
+  }
+
+  .role-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .role-student {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  .role-librarian {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .role-admin {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  .role-all {
+    background: #f1f5f9;
+    color: #475569;
+  }
+
+  /* Code Blocks */
+  pre {
+    background-color: var(--bg-surface-alt);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-primary);
+  }
+
+  .copy-notice {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .btn-outline:hover {
+    background: var(--bg-surface-alt);
+  }
+</style>
+
+<div class="container">
+  <!-- Banner -->
+  <header class="header-card">
+    <div class="title-area">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+        <span class="badge-tag">TÀI LIỆU SRS • IEEE 830 STANDARD</span>
+        <span style="font-size:12px; color:var(--text-muted);">Dự án: LibIOG4</span>
+      </div>
+      <h1>Cây Phân Rã Tính Năng Hệ Thống (Feature Tree)</h1>
+      <p>Bản đồ cấu trúc chức năng phân rã theo nhóm FR-01 → FR-06 và mô hình phân quyền người dùng RBAC.</p>
+    </div>
+    <div>
+      <span class="btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        docs/feature_tree.svg
+      </span>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" id="tabBtn1" onclick="switchTab(1)">Sơ Đồ Vector (Diagram View)</button>
+    <button class="tab-btn" id="tabBtn2" onclick="switchTab(2)">Ma Trận Đặc Tả SRS (Traceability Matrix)</button>
+    <button class="tab-btn" id="tabBtn3" onclick="switchTab(3)">Mã Nguồn PlantUML &amp; Mermaid</button>
+  </nav>
+
+  <!-- TAB 1: Sơ đồ trực quan Vector -->
+  <section class="panel" id="tab1">
+    <div class="panel-header">
+      <div>
+        <h2>Sơ Đồ Phân Cấp Tính Năng (Feature Hierarchy Diagram)</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+          Tệp đồ họa vector gốc lưu tại <code>assignment/docs/feature_tree.svg</code> — bạn có thể kéo thả trực tiếp vào Microsoft Word mà không vỡ hình.
+        </p>
+      </div>
+      <div style="font-size:12px; color:var(--text-muted);">Cuộn ngang/dọc để xem đầy đủ cây tính năng</div>
+    </div>
+
+    <div class="svg-viewport">
+      <!-- Inline SVG Viewer -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 1340" width="1380" height="1340" style="background:#ffffff; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+        <defs>
+          <filter id="sdw" x="-3%" y="-6%" width="108%" height="118%" filterUnits="userSpaceOnUse">
+            <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.08"/>
+          </filter>
+          <filter id="rsdw" x="-5%" y="-10%" width="112%" height="126%" filterUnits="userSpaceOnUse">
+            <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.15"/>
+          </filter>
+        </defs>
+
+        <rect width="100%" height="100%" fill="#F8FAFC"/>
+
+        <!-- Header bar -->
+        <g transform="translate(40, 28)">
+          <rect x="0" y="0" width="1300" height="52" rx="8" fill="#1E293B"/>
+          <text x="24" y="32" fill="#F8FAFC" font-size="17" font-weight="700">SƠ ĐỒ PHÂN RÃ TÍNH NĂNG (FEATURE TREE) - DỰ ÁN LIBIOG4</text>
+          <text x="750" y="32" fill="#94A3B8" font-size="13" font-weight="500">Tài liệu Đặc tả Yêu cầu Phần mềm (SRS) • Chuẩn RBAC &amp; Clean Architecture</text>
+        </g>
+
+        <!-- Lines -->
+        <g fill="none" stroke-linecap="round">
+          <path d="M 270 650 C 300 650, 300 165, 330 165" stroke="#4F46E5" stroke-width="2.5"/>
+          <path d="M 270 650 C 300 650, 300 490, 330 490" stroke="#059669" stroke-width="2.5"/>
+          <path d="M 270 650 C 300 650, 300 770, 330 770" stroke="#D97706" stroke-width="2.5"/>
+          <path d="M 270 650 C 300 650, 300 1000, 330 1000" stroke="#0284C7" stroke-width="2.5"/>
+          <path d="M 270 650 C 300 650, 300 1215, 330 1215" stroke="#7C3AED" stroke-width="2.5"/>
+
+          <path d="M 600 165 C 625 165, 625 125, 650 125" stroke="#818CF8" stroke-width="1.8"/>
+          <path d="M 600 165 C 625 165, 625 175, 650 175" stroke="#818CF8" stroke-width="1.8"/>
+          <path d="M 600 165 C 625 165, 625 235, 650 235" stroke="#818CF8" stroke-width="1.8"/>
+
+          <path d="M 880 125 C 905 125, 905 110, 930 110" stroke="#C7D2FE" stroke-width="1.4"/>
+          <path d="M 880 125 C 905 125, 905 142, 930 142" stroke="#C7D2FE" stroke-width="1.4"/>
+          <path d="M 880 175 C 905 175, 905 175, 930 175" stroke="#C7D2FE" stroke-width="1.4"/>
+          <path d="M 880 235 C 905 235, 905 208, 930 208" stroke="#C7D2FE" stroke-width="1.4"/>
+          <path d="M 880 235 C 905 235, 905 240, 930 240" stroke="#C7D2FE" stroke-width="1.4"/>
+          <path d="M 880 235 C 905 235, 905 272, 930 272" stroke="#C7D2FE" stroke-width="1.4"/>
+
+          <path d="M 600 490 C 625 490, 625 365, 650 365" stroke="#34D399" stroke-width="1.8"/>
+          <path d="M 600 490 C 625 490, 625 440, 650 440" stroke="#34D399" stroke-width="1.8"/>
+          <path d="M 600 490 C 625 490, 625 515, 650 515" stroke="#34D399" stroke-width="1.8"/>
+          <path d="M 600 490 C 625 490, 625 590, 650 590" stroke="#34D399" stroke-width="1.8"/>
+
+          <path d="M 880 365 C 905 365, 905 348, 930 348" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 365 C 905 365, 905 382, 930 382" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 440 C 905 440, 905 422, 930 422" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 440 C 905 440, 905 456, 930 456" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 515 C 905 515, 905 496, 930 496" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 515 C 905 515, 905 530, 930 530" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 590 C 905 590, 905 572, 930 572" stroke="#A7F3D0" stroke-width="1.4"/>
+          <path d="M 880 590 C 905 590, 905 606, 930 606" stroke="#A7F3D0" stroke-width="1.4"/>
+
+          <path d="M 600 770 C 625 770, 625 735, 650 735" stroke="#FBBF24" stroke-width="1.8"/>
+          <path d="M 600 770 C 625 770, 625 805, 650 805" stroke="#FBBF24" stroke-width="1.8"/>
+
+          <path d="M 880 735 C 905 735, 905 710, 930 710" stroke="#FDE68A" stroke-width="1.4"/>
+          <path d="M 880 735 C 905 735, 905 742, 930 742" stroke="#FDE68A" stroke-width="1.4"/>
+          <path d="M 880 735 C 905 735, 905 774, 930 774" stroke="#FDE68A" stroke-width="1.4"/>
+          <path d="M 880 805 C 905 805, 905 808, 930 808" stroke="#FDE68A" stroke-width="1.4"/>
+          <path d="M 880 805 C 905 805, 905 840, 930 840" stroke="#FDE68A" stroke-width="1.4"/>
+
+          <path d="M 600 1000 C 625 1000, 625 940, 650 940" stroke="#38BDF8" stroke-width="1.8"/>
+          <path d="M 600 1000 C 625 1000, 625 1045, 650 1045" stroke="#38BDF8" stroke-width="1.8"/>
+
+          <path d="M 880 940 C 905 940, 905 915, 930 915" stroke="#BAE6FD" stroke-width="1.4"/>
+          <path d="M 880 940 C 905 940, 905 947, 930 947" stroke="#BAE6FD" stroke-width="1.4"/>
+          <path d="M 880 940 C 905 940, 905 979, 930 979" stroke="#BAE6FD" stroke-width="1.4"/>
+          <path d="M 880 1045 C 905 1045, 905 1020, 930 1020" stroke="#BAE6FD" stroke-width="1.4"/>
+          <path d="M 880 1045 C 905 1045, 905 1052, 930 1052" stroke="#BAE6FD" stroke-width="1.4"/>
+          <path d="M 880 1045 C 905 1045, 905 1084, 930 1084" stroke="#BAE6FD" stroke-width="1.4"/>
+
+          <path d="M 600 1215 C 625 1215, 625 1175, 650 1175" stroke="#A78BFA" stroke-width="1.8"/>
+          <path d="M 600 1215 C 625 1215, 625 1255, 650 1255" stroke="#A78BFA" stroke-width="1.8"/>
+
+          <path d="M 880 1175 C 905 1175, 905 1160, 930 1160" stroke="#DDD6FE" stroke-width="1.4"/>
+          <path d="M 880 1175 C 905 1175, 905 1192, 930 1192" stroke="#DDD6FE" stroke-width="1.4"/>
+          <path d="M 880 1255 C 905 1255, 905 1240, 930 1240" stroke="#DDD6FE" stroke-width="1.4"/>
+          <path d="M 880 1255 C 905 1255, 905 1272, 930 1272" stroke="#DDD6FE" stroke-width="1.4"/>
+        </g>
+
+        <!-- Root -->
+        <g transform="translate(40, 605)" filter="url(#rsdw)">
+          <rect width="230" height="90" rx="10" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+          <rect x="0" y="0" width="8" height="90" rx="4" fill="#38BDF8"/>
+          <text x="22" y="32" fill="#38BDF8" font-size="11" font-weight="700">HỆ THỐNG GỐC</text>
+          <text x="22" y="54" fill="#FFFFFF" font-size="16" font-weight="700">LibIOG4 System</text>
+          <text x="22" y="73" fill="#94A3B8" font-size="11">Quản lý Ra Vào Thư Viện</text>
+        </g>
+
+        <!-- Level 1 (Epics) -->
+        <g transform="translate(330, 135)" filter="url(#sdw)">
+          <rect width="270" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+          <rect x="0" y="0" width="6" height="60" rx="3" fill="#4F46E5"/>
+          <text x="16" y="24" fill="#4338CA" font-size="11" font-weight="700">FR-01 • XÁC THỰC &amp; TÀI KHOẢN</text>
+          <text x="16" y="44" fill="#1E1B4B" font-size="13.5" font-weight="600">Quản Lý Tài Khoản &amp; Phân Quyền</text>
+        </g>
+
+        <g transform="translate(330, 460)" filter="url(#sdw)">
+          <rect width="270" height="60" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+          <rect x="0" y="0" width="6" height="60" rx="3" fill="#059669"/>
+          <text x="16" y="24" fill="#065F46" font-size="11" font-weight="700">FR-02 • ACCESS CONTROL ENGINE</text>
+          <text x="16" y="44" fill="#022C22" font-size="13.5" font-weight="600">Kiểm Soát Ra Vào &amp; Điểm Danh</text>
+        </g>
+
+        <g transform="translate(330, 740)" filter="url(#sdw)">
+          <rect width="270" height="60" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+          <rect x="0" y="0" width="6" height="60" rx="3" fill="#D97706"/>
+          <text x="16" y="24" fill="#92400E" font-size="11" font-weight="700">FR-03 • DYNAMIC SYSTEM CONFIG</text>
+          <text x="16" y="44" fill="#451A03" font-size="13.5" font-weight="600">Cấu Hình Động Hệ Thống</text>
+        </g>
+
+        <g transform="translate(330, 970)" filter="url(#sdw)">
+          <rect width="270" height="60" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+          <rect x="0" y="0" width="6" height="60" rx="3" fill="#0284C7"/>
+          <text x="16" y="24" fill="#075985" font-size="11" font-weight="700">FR-04 • REALTIME &amp; ANALYTICS</text>
+          <text x="16" y="44" fill="#082F49" font-size="13.5" font-weight="600">Giám Sát &amp; Báo Cáo Thống Kê</text>
+        </g>
+
+        <g transform="translate(330, 1185)" filter="url(#sdw)">
+          <rect width="270" height="60" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+          <rect x="0" y="0" width="6" height="60" rx="3" fill="#7C3AED"/>
+          <text x="16" y="24" fill="#5B21B6" font-size="11" font-weight="700">FR-05 &amp; FR-06 • USER ENGAGEMENT</text>
+          <text x="16" y="44" fill="#2E1065" font-size="13.5" font-weight="600">Lịch Sử Cá Nhân &amp; Thông Báo</text>
+        </g>
+
+        <!-- Level 2 & 3 Nodes -->
+        <g transform="translate(650, 105)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.1 Xác thực &amp; Đăng nhập</text></g>
+        <g transform="translate(650, 155)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.2 Hồ sơ cá nhân &amp; Mật khẩu</text></g>
+        <g transform="translate(650, 215)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.3 Quản trị thành viên (Admin)</text></g>
+
+        <g transform="translate(930, 96)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Đăng ký tài khoản Sinh viên (@fpt.edu.vn)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 128)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Đăng nhập JWT kép (Access &amp; Refresh Token)</text><rect x="345" y="5" width="47" height="16" rx="3" fill="#F1F5F9"/><text x="355" y="17" fill="#475569" font-size="9" font-weight="600">ALL</text></g>
+        <g transform="translate(930, 162)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Xem hồ sơ, cập nhật SĐT, đổi mật khẩu</text><rect x="345" y="5" width="47" height="16" rx="3" fill="#F1F5F9"/><text x="355" y="17" fill="#475569" font-size="9" font-weight="600">ALL</text></g>
+        <g transform="translate(930, 195)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Tra cứu danh sách thành viên &amp; phân trang</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 227)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Khóa / Mở khóa thẻ vi phạm (Sync Status)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 259)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Phân quyền Role &amp; Xóa mềm Soft Delete</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+
+        <!-- FR-02 Nodes -->
+        <g transform="translate(650, 345)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.1 Thẻ Sinh viên Điện tử</text></g>
+        <g transform="translate(650, 420)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.2 Trạm quét Thủ thư</text></g>
+        <g transform="translate(650, 495)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.3 Access Control Engine</text></g>
+        <g transform="translate(650, 570)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.4 Điểm danh Ngoại tuyến</text></g>
+
+        <g transform="translate(930, 335)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Mã QR động tự làm mới (LIB:MSSV:CARD:EXP)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 369)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Live Badge vị trí thời gian thực (Inside/Outside)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 409)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Quét thẻ tự động qua Camera quầy kiểm soát</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 443)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Ô nhập tay MSSV dự phòng khi camera lỗi</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 483)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Luật kiểm tra hạn thẻ, thẻ khóa &amp; giờ mở cửa</text><rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/><text x="345" y="17" fill="#166534" font-size="9" font-weight="600">ENGINE</text></g>
+        <g transform="translate(930, 517)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Chặn quá tải sức chứa &amp; đảo chiều Check-in/out</text><rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/><text x="345" y="17" fill="#166534" font-size="9" font-weight="600">ENGINE</text></g>
+        <g transform="translate(930, 559)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Lưu trữ log tạm SQLite khi mất mạng (Offline)</text><rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/><text x="345" y="17" fill="#166534" font-size="9" font-weight="600">CLIENT</text></g>
+        <g transform="translate(930, 593)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Tự động đồng bộ hàng loạt (Batch Sync) khi có mạng</text><rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/><text x="345" y="17" fill="#166534" font-size="9" font-weight="600">CLIENT</text></g>
+
+        <!-- FR-03 Nodes -->
+        <g transform="translate(650, 715)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">3.1 Cấu hình vận hành nóng</text></g>
+        <g transform="translate(650, 785)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">3.2 Chế độ bảo trì hệ thống</text></g>
+
+        <g transform="translate(930, 697)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Điều chỉnh sức chứa tối đa (MAX_CAPACITY)</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+        <g transform="translate(930, 729)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Cài đặt giờ đóng/mở cửa (TimePicker)</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+        <g transform="translate(930, 761)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Cài đặt cảnh báo đóng cửa &amp; Thời gian lưu trú max</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+        <g transform="translate(930, 795)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Bật / Tắt chế độ bảo trì nóng (Maintenance Mode)</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+        <g transform="translate(930, 827)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Cập nhật lời nhắn bảo trì tùy chỉnh</text><rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/><text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text></g>
+
+        <!-- FR-04 Nodes -->
+        <g transform="translate(650, 920)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">4.1 Giám sát hiện diện (Live)</text></g>
+        <g transform="translate(650, 1025)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">4.2 Thống kê &amp; Xuất CSV</text></g>
+
+        <g transform="translate(930, 902)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Bộ đếm sức chứa &amp; thanh tỷ lệ lấp đầy trực quan</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 934)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Danh sách sinh viên đang có mặt (Live List &amp; Search)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 966)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Nút Cưỡng chế Check-out (Forced Check-out)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 1007)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Biểu đồ lượt ra/vào theo Giờ / Ngày / Tuần (fl_chart)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 1039)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Phân tích thống kê các khung giờ cao điểm</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+        <g transform="translate(930, 1071)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Xuất file báo cáo định dạng CSV (UTF-8 BOM)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/><text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text></g>
+
+        <!-- FR-05 & 06 Nodes -->
+        <g transform="translate(650, 1155)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">5.1 Nhật ký ra vào cá nhân</text></g>
+        <g transform="translate(650, 1235)" filter="url(#sdw)"><rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/><text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">5.2 Thông báo tự động</text></g>
+
+        <g transform="translate(930, 1147)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Chi tiết phiên ra vào (Giờ vào, ra, tổng phút ở)</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 1179)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Tổng kết tổng số giờ tự học trong tháng</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 1227)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Thông báo xác nhận quét Check-in / Check-out</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+        <g transform="translate(930, 1259)"><rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/><text x="8" y="17" fill="#334155" font-size="11.5">Thông báo cảnh báo khi sắp đến giờ đóng cửa</text><rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/><text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text></g>
+
+        <!-- Legend -->
+        <g transform="translate(40, 1295)">
+          <rect width="1300" height="34" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+          <text x="16" y="21" fill="#475569" font-size="11" font-weight="700">CHÚ THÍCH PHÂN QUYỀN (RBAC):</text>
+          <rect x="220" y="8" width="65" height="18" rx="3" fill="#E0E7FF"/><text x="228" y="21" fill="#4338CA" font-size="10" font-weight="600">STUDENT</text><text x="290" y="21" fill="#64748B" font-size="11">Sinh viên</text>
+          <rect x="380" y="8" width="70" height="18" rx="3" fill="#FEF3C7"/><text x="388" y="21" fill="#92400E" font-size="10" font-weight="600">LIBRARIAN</text><text x="455" y="21" fill="#64748B" font-size="11">Thủ thư</text>
+          <rect x="535" y="8" width="55" height="18" rx="3" fill="#FEE2E2"/><text x="543" y="21" fill="#991B1B" font-size="10" font-weight="600">ADMIN</text><text x="595" y="21" fill="#64748B" font-size="11">Quản trị viên</text>
+          <rect x="690" y="8" width="45" height="18" rx="3" fill="#F1F5F9"/><text x="698" y="21" fill="#475569" font-size="10" font-weight="600">ALL</text><text x="740" y="21" fill="#64748B" font-size="11">Mọi vai trò</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- TAB 2: Traceability Matrix -->
+  <section class="panel" id="tab2" hidden>
+    <div class="panel-header">
+      <div>
+        <h2>Ma Trận Truy Vết Tính Năng (SRS Feature Traceability Matrix)</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+          Bảng đối chiếu chuẩn giữa Mã yêu cầu (FR), Tính năng con, Tác nhân (Actor), Màn hình UI và Endpoint Backend.
+        </p>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Mã Yêu Cầu</th>
+            <th>Tên Nhóm Tính Năng</th>
+            <th>Tính Năng Chi Tiết (Sub-feature)</th>
+            <th>Vai Trò (Actor)</th>
+            <th>Màn Hình UI (Flutter)</th>
+            <th>REST API / Xử Lý Kỹ Thuật</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>FR-01.1</strong></td>
+            <td>Quản Lý Tài Khoản</td>
+            <td>Đăng ký tài khoản Sinh viên (@fpt.edu.vn)</td>
+            <td><span class="role-pill role-student">STUDENT</span></td>
+            <td><code>RegisterScreen</code></td>
+            <td><code>POST /api/auth/register</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-01.2</strong></td>
+            <td>Quản Lý Tài Khoản</td>
+            <td>Đăng nhập hệ thống &amp; Phân luồng JWT</td>
+            <td><span class="role-pill role-all">ALL</span></td>
+            <td><code>LoginScreen</code></td>
+            <td><code>POST /api/auth/login</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-01.3</strong></td>
+            <td>Quản Lý Tài Khoản</td>
+            <td>Xem hồ sơ &amp; Đổi mật khẩu tài khoản</td>
+            <td><span class="role-pill role-all">ALL</span></td>
+            <td><code>StudentProfileScreen</code></td>
+            <td><code>PUT /api/auth/change-password</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-01.4</strong></td>
+            <td>Quản Lý Tài Khoản</td>
+            <td>Tra cứu danh sách &amp; Khóa/Mở khóa thẻ</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>UserManagementTab</code></td>
+            <td><code>PATCH /api/admin/users/:id/status</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-01.5</strong></td>
+            <td>Quản Lý Tài Khoản</td>
+            <td>Phân quyền vai trò &amp; Xóa mềm Soft-delete</td>
+            <td><span class="role-pill role-admin">ADMIN</span></td>
+            <td><code>UserManagementTab</code></td>
+            <td><code>DELETE /api/admin/users/:id</code></td>
+          </tr>
+
+          <tr>
+            <td><strong>FR-02.1</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Thẻ SV điện tử &amp; Mã QR động tự làm mới</td>
+            <td><span class="role-pill role-student">STUDENT</span></td>
+            <td><code>StudentHomeScreen</code></td>
+            <td>Render <code>LIB:MSSV:CARD:EXP</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-02.2</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Badge vị trí thời gian thực (Inside/Outside)</td>
+            <td><span class="role-pill role-student">STUDENT</span></td>
+            <td><code>StudentHomeScreen</code></td>
+            <td>BLoC State lắng nghe <code>is_inside</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-02.3</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Quét thẻ tự động qua Camera quầy kiểm soát</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>QrScannerTab</code></td>
+            <td><code>POST /api/checkin/scan</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-02.4</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Nhập tay MSSV dự phòng khi camera lỗi</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>QrScannerTab</code></td>
+            <td><code>POST /api/checkin/manual</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-02.5</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Access Control Engine (Luật kiểm tra vào/ra)</td>
+            <td><span class="role-pill role-all">SYSTEM</span></td>
+            <td>Backend Middleware</td>
+            <td>Kiểm tra hạn thẻ, giờ mở cửa, sức chứa</td>
+          </tr>
+          <tr>
+            <td><strong>FR-02.6</strong></td>
+            <td>Kiểm Soát Ra Vào</td>
+            <td>Điểm danh ngoại tuyến (Offline SQLite) &amp; Sync</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>QrScannerTab</code></td>
+            <td><code>LocalDbHelper</code> (SQLite) + Batch API</td>
+          </tr>
+
+          <tr>
+            <td><strong>FR-03.1</strong></td>
+            <td>Cấu Hình Động</td>
+            <td>Thay đổi sức chứa tối đa (MAX_CAPACITY)</td>
+            <td><span class="role-pill role-admin">ADMIN</span></td>
+            <td><code>SystemConfigTab</code></td>
+            <td><code>PUT /api/admin/config</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-03.2</strong></td>
+            <td>Cấu Hình Động</td>
+            <td>Cài đặt giờ mở/đóng cửa &amp; Thời gian cảnh báo</td>
+            <td><span class="role-pill role-admin">ADMIN</span></td>
+            <td><code>SystemConfigTab</code></td>
+            <td><code>PUT /api/admin/config</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-03.3</strong></td>
+            <td>Cấu Hình Động</td>
+            <td>Bật/Tắt chế độ bảo trì nóng &amp; Thông điệp</td>
+            <td><span class="role-pill role-admin">ADMIN</span></td>
+            <td><code>SystemConfigTab</code></td>
+            <td>Zero-downtime hot update</td>
+          </tr>
+
+          <tr>
+            <td><strong>FR-04.1</strong></td>
+            <td>Giám Sát &amp; Báo Cáo</td>
+            <td>Bộ đếm sức chứa &amp; Tỷ lệ % lấp đầy realtime</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>LiveOccupancyTab</code></td>
+            <td><code>GET /api/checkin/live</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-04.2</strong></td>
+            <td>Giám Sát &amp; Báo Cáo</td>
+            <td>Danh sách SV có mặt &amp; Cưỡng chế Check-out</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>LiveOccupancyTab</code></td>
+            <td><code>POST /api/checkin/force-checkout</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-04.3</strong></td>
+            <td>Giám Sát &amp; Báo Cáo</td>
+            <td>Biểu đồ lượng khách theo Giờ/Ngày/Tuần</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>ReportStatsTab</code></td>
+            <td>Thư viện <code>fl_chart</code> Flutter</td>
+          </tr>
+          <tr>
+            <td><strong>FR-04.4</strong></td>
+            <td>Giám Sát &amp; Báo Cáo</td>
+            <td>Xuất file báo cáo thống kê CSV (UTF-8 BOM)</td>
+            <td><span class="role-pill role-librarian">LIBRARIAN</span></td>
+            <td><code>ReportStatsTab</code></td>
+            <td><code>GET /api/admin/reports/csv</code></td>
+          </tr>
+
+          <tr>
+            <td><strong>FR-05 &amp; 06</strong></td>
+            <td>Lịch Sử &amp; Thông Báo</td>
+            <td>Xem lịch sử cá nhân &amp; Tổng giờ tự học</td>
+            <td><span class="role-pill role-student">STUDENT</span></td>
+            <td><code>StudentHistoryScreen</code></td>
+            <td><code>GET /api/history/me</code></td>
+          </tr>
+          <tr>
+            <td><strong>FR-05 &amp; 06</strong></td>
+            <td>Lịch Sử &amp; Thông Báo</td>
+            <td>Thông báo xác nhận quét &amp; Nhắc nhở đóng cửa</td>
+            <td><span class="role-pill role-student">STUDENT</span></td>
+            <td>In-app Notification</td>
+            <td>Background Alert Engine</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 3: Mã nguồn Diagram -->
+  <section class="panel" id="tab3" hidden>
+    <div class="panel-header">
+      <div>
+        <h2>Mã Nguồn Biểu Đồ (Diagram Source Codes)</h2>
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+          Copy trực tiếp các mã dưới đây vào PlantUML, Mermaid Live Editor hoặc Draw.io để tùy biến thêm theo mẫu báo cáo trường bạn.
+        </p>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size:14px; font-weight:700; margin-bottom:8px;">1. Mã PlantUML WBS (Khuyên dùng cho Báo cáo SRS chuyên nghiệp)</h3>
+      <p class="copy-notice" style="margin-bottom:6px;">Copy vào https://www.plantuml.com/plantuml để xuất ảnh PNG/SVG:</p>
+      <pre><code>@startwbs
+* [Dự án LibIOG4]\nHệ Thống Ghi Nhận Ra Vào Thư Viện
+
+** [FR-01] Quản Lý Tài Khoản &amp; Phân Quyền
+*** 1.1 Xác thực &amp; Đăng nhập
+**** Đăng ký tài khoản Sinh viên (@fpt.edu.vn)
+**** Đăng nhập JWT kép (Access &amp; Refresh Token)
+**** Phân luồng điều hướng màn hình theo Role
+*** 1.2 Hồ sơ cá nhân
+**** Xem thông tin sinh viên &amp; Cập nhật SĐT
+**** Đổi mật khẩu tài khoản cá nhân
+*** 1.3 Quản trị thành viên (Admin/Thủ thư)
+**** Tra cứu danh sách có phân trang &amp; bộ lọc
+**** Khóa / Mở khóa thẻ sinh viên (Đồng bộ status)
+**** Cấp quyền vai trò &amp; Xóa mềm Soft-delete (Admin)
+
+** [FR-02] Kiểm Soát Ra Vào &amp; Điểm Danh
+*** 2.1 Thẻ Sinh viên Điện tử
+**** Mã QR động tự làm mới (LIB:MSSV:CARD:EXP)
+**** Live Badge vị trí thời gian thực (Inside/Outside)
+*** 2.2 Trạm quét Thủ thư
+**** Quét thẻ tự động bằng Camera trạm kiểm soát
+**** Ô nhập tay MSSV dự phòng khi camera lỗi
+*** 2.3 Access Control Engine
+**** Kiểm tra hiệu lực thẻ &amp; khung giờ mở cửa
+**** Kiểm tra sức chứa tối đa &amp; đảo chiều Check-in/out
+*** 2.4 Điểm danh Ngoại tuyến (Offline Mode)
+**** Lưu trữ nhật ký cục bộ SQLite khi mất mạng
+**** Tự động đồng bộ hàng loạt (Batch Sync) khi có mạng
+
+** [FR-03] Cấu Hình Động Hệ Thống
+*** 3.1 Cấu hình vận hành nóng
+**** Điều chỉnh Sức chứa tối đa (MAX_CAPACITY)
+**** Thiết lập Giờ mở/đóng cửa (TimePicker)
+**** Cài đặt Cảnh báo đóng cửa &amp; Max session
+*** 3.2 Chế độ bảo trì hệ thống
+**** Bật / Tắt chế độ bảo trì tức thì
+**** Cập nhật thông điệp bảo trì tùy chỉnh
+
+** [FR-04] Giám Sát &amp; Báo Cáo Thống Kê
+*** 4.1 Giám sát hiện diện (Live Occupancy)
+**** Bộ đếm sức chứa &amp; thanh tỷ lệ % lấp đầy
+**** Danh sách sinh viên đang có mặt trong thư viện
+**** Nút Cưỡng chế Check-out (Forced Check-out)
+*** 4.2 Thống kê &amp; Báo cáo
+**** Biểu đồ lượng người theo Giờ/Ngày/Tuần (fl_chart)
+**** Nhận diện &amp; thống kê khung giờ cao điểm
+**** Xuất file báo cáo danh sách CSV (UTF-8 BOM)
+
+** [FR-05 &amp; 06] Lịch Sử Cá Nhân &amp; Thông Báo
+*** 5.1 Nhật ký ra vào cá nhân
+**** Chi tiết từng phiên (Giờ vào, ra, số phút)
+**** Tổng kết số giờ tự học trong tháng
+*** 5.2 Thông báo tự động
+**** Thông báo xác nhận quét thẻ thành công
+**** Thông báo nhắc nhở sắp đến giờ đóng cửa
+@endwbs</code></pre>
+    </div>
+
+    <div style="margin-top:16px;">
+      <h3 style="font-size:14px; font-weight:700; margin-bottom:8px;">2. Mã Mermaid Mindmap (Dùng trong Markdown / GitHub / Notion / VSCode)</h3>
+      <pre><code>mindmap
+  root((LibIOG4 System))
+    FR-01 Tài Khoản &amp; Phân Quyền
+      Xác thực JWT đa vai trò
+      Thẻ &amp; Đổi mật khẩu
+      Khóa / Mở khóa tài khoản
+      Phân quyền &amp; Xóa mềm
+    FR-02 Kiểm Soát Ra Vào
+      Thẻ QR động đổi màu Live Badge
+      Camera quét &amp; Nhập tay MSSV
+      Engine kiểm tra điều kiện vào/ra
+      Offline SQLite &amp; Auto Sync
+    FR-03 Cấu Hình Động
+      Sức chứa tối đa
+      Giờ mở &amp; đóng cửa
+      Thời gian lưu trú &amp; cảnh báo
+      Chế độ bảo trì nóng
+    FR-04 Giám Sát &amp; Báo Cáo
+      Live Occupancy &amp; Bộ đếm
+      Forced Check-out tại chỗ
+      Biểu đồ fl_chart theo giờ/ngày
+      Xuất file CSV UTF-8 BOM
+    FR-05 &amp; 06 Lịch Sử &amp; Thông Báo
+      Lịch sử &amp; Giờ tự học trong tháng
+      Thông báo quét thẻ &amp; Nhắc đóng cửa</code></pre>
+    </div>
+  </section>
+</div>
+
+<script>
+  function switchTab(index) {
+    const tabs = [1, 2, 3];
+    tabs.forEach(function(i) {
+      const panel = document.getElementById('tab' + i);
+      const btn = document.getElementById('tabBtn' + i);
+      if (panel && btn) {
+        if (i === index) {
+          panel.hidden = false;
+          btn.classList.add('active');
+        } else {
+          panel.hidden = true;
+          btn.classList.remove('active');
+        }
+      }
+    });
+  }
+</script>

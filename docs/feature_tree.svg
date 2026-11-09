@@ -1,0 +1,443 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 1340" width="100%" height="100%" style="background:#ffffff; font-family:'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Shadow Filter -->
+    <filter id="shadow" x="-3%" y="-6%" width="108%" height="118%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+    <filter id="root-shadow" x="-5%" y="-10%" width="112%" height="126%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="100%" height="100%" fill="#F8FAFC"/>
+
+  <!-- ================= HEADER ================= -->
+  <g transform="translate(40, 28)">
+    <rect x="0" y="0" width="1300" height="52" rx="8" fill="#1E293B"/>
+    <text x="24" y="32" fill="#F8FAFC" font-size="17" font-weight="700" letter-spacing="0.5">SƠ ĐỒ PHÂN RÃ TÍNH NĂNG (FEATURE TREE) - DỰ ÁN LIBIOG4</text>
+    <text x="750" y="32" fill="#94A3B8" font-size="13" font-weight="500">Tài liệu Đặc tả Yêu cầu Phần mềm (SRS) • Chuẩn RBAC &amp; Clean Architecture</text>
+  </g>
+
+  <!-- ================= CONNECTING LINES (BEZIER PATHS) ================= -->
+  <g fill="none" stroke-linecap="round">
+    <!-- Lines from Root (x=270, y=650) to Level 1 -->
+    <!-- to FR-01 (x=330, y=165) -->
+    <path d="M 270 650 C 300 650, 300 165, 330 165" stroke="#4F46E5" stroke-width="2.5"/>
+    <!-- to FR-02 (x=330, y=490) -->
+    <path d="M 270 650 C 300 650, 300 490, 330 490" stroke="#059669" stroke-width="2.5"/>
+    <!-- to FR-03 (x=330, y=770) -->
+    <path d="M 270 650 C 300 650, 300 770, 330 770" stroke="#D97706" stroke-width="2.5"/>
+    <!-- to FR-04 (x=330, y=1000) -->
+    <path d="M 270 650 C 300 650, 300 1000, 330 1000" stroke="#0284C7" stroke-width="2.5"/>
+    <!-- to FR-05 & 06 (x=330, y=1215) -->
+    <path d="M 270 650 C 300 650, 300 1215, 330 1215" stroke="#7C3AED" stroke-width="2.5"/>
+
+    <!-- FR-01 Sub-connectors -->
+    <!-- Level 1 (x=600, y=165) to Level 2 (x=650) -->
+    <path d="M 600 165 C 625 165, 625 125, 650 125" stroke="#818CF8" stroke-width="1.8"/>
+    <path d="M 600 165 C 625 165, 625 175, 650 175" stroke="#818CF8" stroke-width="1.8"/>
+    <path d="M 600 165 C 625 165, 625 235, 650 235" stroke="#818CF8" stroke-width="1.8"/>
+
+    <!-- FR-01 Level 2 to Level 3 -->
+    <path d="M 880 125 C 905 125, 905 110, 930 110" stroke="#C7D2FE" stroke-width="1.4"/>
+    <path d="M 880 125 C 905 125, 905 142, 930 142" stroke="#C7D2FE" stroke-width="1.4"/>
+    <path d="M 880 175 C 905 175, 905 175, 930 175" stroke="#C7D2FE" stroke-width="1.4"/>
+    <path d="M 880 235 C 905 235, 905 208, 930 208" stroke="#C7D2FE" stroke-width="1.4"/>
+    <path d="M 880 235 C 905 235, 905 240, 930 240" stroke="#C7D2FE" stroke-width="1.4"/>
+    <path d="M 880 235 C 905 235, 905 272, 930 272" stroke="#C7D2FE" stroke-width="1.4"/>
+
+    <!-- FR-02 Sub-connectors -->
+    <!-- Level 1 (x=600, y=490) to Level 2 (x=650) -->
+    <path d="M 600 490 C 625 490, 625 365, 650 365" stroke="#34D399" stroke-width="1.8"/>
+    <path d="M 600 490 C 625 490, 625 440, 650 440" stroke="#34D399" stroke-width="1.8"/>
+    <path d="M 600 490 C 625 490, 625 515, 650 515" stroke="#34D399" stroke-width="1.8"/>
+    <path d="M 600 490 C 625 490, 625 590, 650 590" stroke="#34D399" stroke-width="1.8"/>
+
+    <!-- FR-02 Level 2 to Level 3 -->
+    <path d="M 880 365 C 905 365, 905 348, 930 348" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 365 C 905 365, 905 382, 930 382" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 440 C 905 440, 905 422, 930 422" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 440 C 905 440, 905 456, 930 456" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 515 C 905 515, 905 496, 930 496" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 515 C 905 515, 905 530, 930 530" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 590 C 905 590, 905 572, 930 572" stroke="#A7F3D0" stroke-width="1.4"/>
+    <path d="M 880 590 C 905 590, 905 606, 930 606" stroke="#A7F3D0" stroke-width="1.4"/>
+
+    <!-- FR-03 Sub-connectors -->
+    <!-- Level 1 (x=600, y=770) to Level 2 (x=650) -->
+    <path d="M 600 770 C 625 770, 625 735, 650 735" stroke="#FBBF24" stroke-width="1.8"/>
+    <path d="M 600 770 C 625 770, 625 805, 650 805" stroke="#FBBF24" stroke-width="1.8"/>
+
+    <!-- FR-03 Level 2 to Level 3 -->
+    <path d="M 880 735 C 905 735, 905 710, 930 710" stroke="#FDE68A" stroke-width="1.4"/>
+    <path d="M 880 735 C 905 735, 905 742, 930 742" stroke="#FDE68A" stroke-width="1.4"/>
+    <path d="M 880 735 C 905 735, 905 774, 930 774" stroke="#FDE68A" stroke-width="1.4"/>
+    <path d="M 880 805 C 905 805, 905 808, 930 808" stroke="#FDE68A" stroke-width="1.4"/>
+    <path d="M 880 805 C 905 805, 905 840, 930 840" stroke="#FDE68A" stroke-width="1.4"/>
+
+    <!-- FR-04 Sub-connectors -->
+    <!-- Level 1 (x=600, y=1000) to Level 2 (x=650) -->
+    <path d="M 600 1000 C 625 1000, 625 940, 650 940" stroke="#38BDF8" stroke-width="1.8"/>
+    <path d="M 600 1000 C 625 1000, 625 1045, 650 1045" stroke="#38BDF8" stroke-width="1.8"/>
+
+    <!-- FR-04 Level 2 to Level 3 -->
+    <path d="M 880 940 C 905 940, 905 915, 930 915" stroke="#BAE6FD" stroke-width="1.4"/>
+    <path d="M 880 940 C 905 940, 905 947, 930 947" stroke="#BAE6FD" stroke-width="1.4"/>
+    <path d="M 880 940 C 905 940, 905 979, 930 979" stroke="#BAE6FD" stroke-width="1.4"/>
+    <path d="M 880 1045 C 905 1045, 905 1020, 930 1020" stroke="#BAE6FD" stroke-width="1.4"/>
+    <path d="M 880 1045 C 905 1045, 905 1052, 930 1052" stroke="#BAE6FD" stroke-width="1.4"/>
+    <path d="M 880 1045 C 905 1045, 905 1084, 930 1084" stroke="#BAE6FD" stroke-width="1.4"/>
+
+    <!-- FR-05 & 06 Sub-connectors -->
+    <!-- Level 1 (x=600, y=1215) to Level 2 (x=650) -->
+    <path d="M 600 1215 C 625 1215, 625 1175, 650 1175" stroke="#A78BFA" stroke-width="1.8"/>
+    <path d="M 600 1215 C 625 1215, 625 1255, 650 1255" stroke="#A78BFA" stroke-width="1.8"/>
+
+    <!-- FR-05 & 06 Level 2 to Level 3 -->
+    <path d="M 880 1175 C 905 1175, 905 1160, 930 1160" stroke="#DDD6FE" stroke-width="1.4"/>
+    <path d="M 880 1175 C 905 1175, 905 1192, 930 1192" stroke="#DDD6FE" stroke-width="1.4"/>
+    <path d="M 880 1255 C 905 1255, 905 1240, 930 1240" stroke="#DDD6FE" stroke-width="1.4"/>
+    <path d="M 880 1255 C 905 1255, 905 1272, 930 1272" stroke="#DDD6FE" stroke-width="1.4"/>
+  </g>
+
+  <!-- ================= LEVEL 0: ROOT NODE ================= -->
+  <g transform="translate(40, 605)" filter="url(#root-shadow)">
+    <rect width="230" height="90" rx="10" fill="#0F172A" stroke="#334155" stroke-width="2"/>
+    <rect x="0" y="0" width="8" height="90" rx="4" fill="#38BDF8"/>
+    <text x="22" y="32" fill="#38BDF8" font-size="11" font-weight="700" letter-spacing="1">HỆ THỐNG GỐC</text>
+    <text x="22" y="54" fill="#FFFFFF" font-size="16" font-weight="700">LibIOG4 System</text>
+    <text x="22" y="73" fill="#94A3B8" font-size="11">Quản lý Ra Vào Thư Viện</text>
+  </g>
+
+  <!-- ================= LEVEL 1: MODULES (5 EPICS / FR) ================= -->
+
+  <!-- FR-01 Module -->
+  <g transform="translate(330, 135)" filter="url(#shadow)">
+    <rect width="270" height="60" rx="8" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="60" rx="3" fill="#4F46E5"/>
+    <text x="16" y="24" fill="#4338CA" font-size="11" font-weight="700">FR-01 • XÁC THỰC &amp; TÀI KHOẢN</text>
+    <text x="16" y="44" fill="#1E1B4B" font-size="13.5" font-weight="600">Quản Lý Tài Khoản &amp; Phân Quyền</text>
+  </g>
+
+  <!-- FR-02 Module -->
+  <g transform="translate(330, 460)" filter="url(#shadow)">
+    <rect width="270" height="60" rx="8" fill="#ECFDF5" stroke="#059669" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="60" rx="3" fill="#059669"/>
+    <text x="16" y="24" fill="#065F46" font-size="11" font-weight="700">FR-02 • ACCESS CONTROL ENGINE</text>
+    <text x="16" y="44" fill="#022C22" font-size="13.5" font-weight="600">Kiểm Soát Ra Vào &amp; Điểm Danh</text>
+  </g>
+
+  <!-- FR-03 Module -->
+  <g transform="translate(330, 740)" filter="url(#shadow)">
+    <rect width="270" height="60" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="60" rx="3" fill="#D97706"/>
+    <text x="16" y="24" fill="#92400E" font-size="11" font-weight="700">FR-03 • DYNAMIC SYSTEM CONFIG</text>
+    <text x="16" y="44" fill="#451A03" font-size="13.5" font-weight="600">Cấu Hình Động Hệ Thống</text>
+  </g>
+
+  <!-- FR-04 Module -->
+  <g transform="translate(330, 970)" filter="url(#shadow)">
+    <rect width="270" height="60" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="60" rx="3" fill="#0284C7"/>
+    <text x="16" y="24" fill="#075985" font-size="11" font-weight="700">FR-04 • REALTIME &amp; ANALYTICS</text>
+    <text x="16" y="44" fill="#082F49" font-size="13.5" font-weight="600">Giám Sát &amp; Báo Cáo Thống Kê</text>
+  </g>
+
+  <!-- FR-05 & 06 Module -->
+  <g transform="translate(330, 1185)" filter="url(#shadow)">
+    <rect width="270" height="60" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="0" y="0" width="6" height="60" rx="3" fill="#7C3AED"/>
+    <text x="16" y="24" fill="#5B21B6" font-size="11" font-weight="700">FR-05 &amp; FR-06 • USER ENGAGEMENT</text>
+    <text x="16" y="44" fill="#2E1065" font-size="13.5" font-weight="600">Lịch Sử Cá Nhân &amp; Thông Báo</text>
+  </g>
+
+
+  <!-- ================= LEVEL 2: MAJOR FEATURES ================= -->
+
+  <!-- FR-01 Features -->
+  <g transform="translate(650, 105)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.1 Xác thực &amp; Đăng nhập</text>
+  </g>
+  <g transform="translate(650, 155)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.2 Hồ sơ cá nhân &amp; Mật khẩu</text>
+  </g>
+  <g transform="translate(650, 215)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">1.3 Quản trị thành viên (Admin)</text>
+  </g>
+
+  <!-- FR-02 Features -->
+  <g transform="translate(650, 345)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.1 Thẻ Sinh viên Điện tử</text>
+  </g>
+  <g transform="translate(650, 420)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.2 Trạm quét Thủ thư</text>
+  </g>
+  <g transform="translate(650, 495)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.3 Access Control Engine</text>
+  </g>
+  <g transform="translate(650, 570)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">2.4 Điểm danh Ngoại tuyến</text>
+  </g>
+
+  <!-- FR-03 Features -->
+  <g transform="translate(650, 715)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">3.1 Cấu hình vận hành nóng</text>
+  </g>
+  <g transform="translate(650, 785)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">3.2 Chế độ bảo trì hệ thống</text>
+  </g>
+
+  <!-- FR-04 Features -->
+  <g transform="translate(650, 920)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">4.1 Giám sát hiện diện (Live)</text>
+  </g>
+  <g transform="translate(650, 1025)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">4.2 Thống kê &amp; Xuất CSV</text>
+  </g>
+
+  <!-- FR-05 & 06 Features -->
+  <g transform="translate(650, 1155)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">5.1 Nhật ký ra vào cá nhân</text>
+  </g>
+  <g transform="translate(650, 1235)" filter="url(#shadow)">
+    <rect width="230" height="40" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="25" fill="#1E293B" font-size="12" font-weight="600">5.2 Thông báo tự động</text>
+  </g>
+
+
+  <!-- ================= LEVEL 3: DETAILED SUB-FEATURES & ROLES ================= -->
+
+  <!-- FR-01 Leaves -->
+  <!-- 1.1 -->
+  <g transform="translate(930, 96)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Đăng ký tài khoản Sinh viên (@fpt.edu.vn)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <g transform="translate(930, 128)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Đăng nhập JWT kép (Access &amp; Refresh Token)</text>
+    <rect x="345" y="5" width="47" height="16" rx="3" fill="#F1F5F9"/>
+    <text x="355" y="17" fill="#475569" font-size="9" font-weight="600">ALL</text>
+  </g>
+  <!-- 1.2 -->
+  <g transform="translate(930, 162)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Xem hồ sơ, cập nhật SĐT, đổi mật khẩu</text>
+    <rect x="345" y="5" width="47" height="16" rx="3" fill="#F1F5F9"/>
+    <text x="355" y="17" fill="#475569" font-size="9" font-weight="600">ALL</text>
+  </g>
+  <!-- 1.3 -->
+  <g transform="translate(930, 195)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Tra cứu danh sách thành viên &amp; phân trang</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 227)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Khóa / Mở khóa thẻ vi phạm (Sync Status)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 259)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Phân quyền Role &amp; Xóa mềm Soft Delete</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+
+  <!-- FR-02 Leaves -->
+  <!-- 2.1 -->
+  <g transform="translate(930, 335)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Mã QR động tự làm mới (LIB:MSSV:CARD:EXP)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <g transform="translate(930, 369)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Live Badge vị trí thời gian thực (Inside/Outside)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <!-- 2.2 -->
+  <g transform="translate(930, 409)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Quét thẻ tự động qua Camera quầy kiểm soát</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 443)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Ô nhập tay MSSV dự phòng khi camera lỗi</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <!-- 2.3 -->
+  <g transform="translate(930, 483)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Luật kiểm tra hạn thẻ, thẻ khóa &amp; giờ mở cửa</text>
+    <rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/>
+    <text x="345" y="17" fill="#166534" font-size="9" font-weight="600">ENGINE</text>
+  </g>
+  <g transform="translate(930, 517)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Chặn quá tải sức chứa &amp; đảo chiều Check-in/out</text>
+    <rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/>
+    <text x="345" y="17" fill="#166534" font-size="9" font-weight="600">ENGINE</text>
+  </g>
+  <!-- 2.4 -->
+  <g transform="translate(930, 559)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Lưu trữ log tạm SQLite khi mất mạng (Offline)</text>
+    <rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/>
+    <text x="345" y="17" fill="#166534" font-size="9" font-weight="600">CLIENT</text>
+  </g>
+  <g transform="translate(930, 593)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Tự động đồng bộ hàng loạt (Batch Sync) khi có mạng</text>
+    <rect x="335" y="5" width="57" height="16" rx="3" fill="#DCFCE7"/>
+    <text x="345" y="17" fill="#166534" font-size="9" font-weight="600">CLIENT</text>
+  </g>
+
+  <!-- FR-03 Leaves -->
+  <!-- 3.1 -->
+  <g transform="translate(930, 697)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Điều chỉnh sức chứa tối đa (MAX_CAPACITY)</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+  <g transform="translate(930, 729)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Cài đặt giờ đóng/mở cửa (TimePicker)</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+  <g transform="translate(930, 761)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Cài đặt cảnh báo đóng cửa &amp; Thời gian lưu trú max</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+  <!-- 3.2 -->
+  <g transform="translate(930, 795)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Bật / Tắt chế độ bảo trì nóng (Maintenance Mode)</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+  <g transform="translate(930, 827)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Cập nhật lời nhắn bảo trì tùy chỉnh</text>
+    <rect x="342" y="5" width="50" height="16" rx="3" fill="#FEE2E2"/>
+    <text x="350" y="17" fill="#991B1B" font-size="9" font-weight="600">ADMIN</text>
+  </g>
+
+  <!-- FR-04 Leaves -->
+  <!-- 4.1 -->
+  <g transform="translate(930, 902)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Bộ đếm sức chứa &amp; thanh tỷ lệ lấp đầy trực quan</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 934)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Danh sách sinh viên đang có mặt (Live List &amp; Search)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 966)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Nút Cưỡng chế Check-out (Forced Check-out)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <!-- 4.2 -->
+  <g transform="translate(930, 1007)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Biểu đồ lượt ra/vào theo Giờ / Ngày / Tuần (fl_chart)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 1039)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Phân tích thống kê các khung giờ cao điểm</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+  <g transform="translate(930, 1071)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Xuất file báo cáo định dạng CSV (UTF-8 BOM)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#FEF3C7"/>
+    <text x="336" y="17" fill="#92400E" font-size="9" font-weight="600">LIBRARIAN</text>
+  </g>
+
+  <!-- FR-05 & 06 Leaves -->
+  <!-- 5.1 -->
+  <g transform="translate(930, 1147)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Chi tiết phiên ra vào (Giờ vào, ra, tổng phút ở)</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <g transform="translate(930, 1179)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Tổng kết tổng số giờ tự học trong tháng</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <!-- 5.2 -->
+  <g transform="translate(930, 1227)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Thông báo xác nhận quét Check-in / Check-out</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+  <g transform="translate(930, 1259)">
+    <rect width="400" height="26" rx="4" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="8" y="17" fill="#334155" font-size="11.5">Thông báo cảnh báo khi sắp đến giờ đóng cửa</text>
+    <rect x="330" y="5" width="62" height="16" rx="3" fill="#E0E7FF"/>
+    <text x="340" y="17" fill="#4338CA" font-size="9" font-weight="600">STUDENT</text>
+  </g>
+
+  <!-- ================= FOOTER / LEGEND ================= -->
+  <g transform="translate(40, 1295)">
+    <rect width="1300" height="34" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="16" y="21" fill="#475569" font-size="11" font-weight="700">CHÚ THÍCH PHÂN QUYỀN (RBAC):</text>
+
+    <rect x="220" y="8" width="65" height="18" rx="3" fill="#E0E7FF"/>
+    <text x="228" y="21" fill="#4338CA" font-size="10" font-weight="600">STUDENT</text>
+    <text x="290" y="21" fill="#64748B" font-size="11">Sinh viên</text>
+
+    <rect x="380" y="8" width="70" height="18" rx="3" fill="#FEF3C7"/>
+    <text x="388" y="21" fill="#92400E" font-size="10" font-weight="600">LIBRARIAN</text>
+    <text x="455" y="21" fill="#64748B" font-size="11">Thủ thư</text>
+
+    <rect x="535" y="8" width="55" height="18" rx="3" fill="#FEE2E2"/>
+    <text x="543" y="21" fill="#991B1B" font-size="10" font-weight="600">ADMIN</text>
+    <text x="595" y="21" fill="#64748B" font-size="11">Quản trị viên</text>
+
+    <rect x="690" y="8" width="45" height="18" rx="3" fill="#F1F5F9"/>
+    <text x="698" y="21" fill="#475569" font-size="10" font-weight="600">ALL</text>
+    <text x="740" y="21" fill="#64748B" font-size="11">Mọi vai trò</text>
+
+    <text x="960" y="21" fill="#94A3B8" font-size="11" font-style="italic">Đồ họa Vector Chuẩn SRS • Sẵn sàng chèn vào Microsoft Word &amp; PDF</text>
+  </g>
+</svg>
