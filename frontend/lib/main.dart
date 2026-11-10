@@ -18,6 +18,12 @@ import 'presentation/screens/student/student_home_screen.dart';
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  debugPrint('[FCM] Nhận tin nhắn ngầm (Background/Killed): ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -34,8 +40,18 @@ void main() async {
   if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
     try {
       await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
       final messaging = FirebaseMessaging.instance;
       await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        provisional: false,
+      );
+
+      // Cho phép hiển thị heads-up banner khi app đang mở (Foreground)
+      await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
@@ -43,11 +59,14 @@ void main() async {
 
       final token = await messaging.getToken();
       if (token != null) {
-        debugPrint('[FCM] Device Token: $token');
+        debugPrint('==================================================');
+        debugPrint('[FCM] DEVICE TOKEN: $token');
+        debugPrint('==================================================');
         await FcmService.registerDeviceToken(deviceToken: token);
       }
 
       messaging.onTokenRefresh.listen((newToken) {
+        debugPrint('[FCM] Device Token đã được làm mới: $newToken');
         FcmService.registerDeviceToken(deviceToken: newToken);
       });
 

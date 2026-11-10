@@ -126,10 +126,74 @@ async function registerDevice(req, res, next) {
     }
 
     await User.findByIdAndUpdate(req.user._id, { $set: { device_token: rawToken } });
+    console.log(`[FCM] Đã cập nhật device_token cho ${req.user.student_id}: ${rawToken.substring(0, 15)}...`);
     res.json({ success: true, message: 'Đã đăng ký thiết bị' });
   } catch (err) {
     next(err);
   }
 }
 
-module.exports = { getMe, getMyQr, updateMe, registerDevice };
+// GET /api/users/me/fcm-status — kiểm tra tình trạng kết nối FCM và token
+async function getFcmStatus(req, res, next) {
+  try {
+    const user = await User.findById(req.user._id).select('student_id full_name device_token');
+    const { isFirebaseConfigured } = require('../services/fcm_service');
+    const hasToken = Boolean(user && user.device_token && user.device_token.trim());
+    const isConfigured = Boolean(isFirebaseConfigured());
+
+    res.json({
+      success: true,
+      data: {
+        studentId: user?.student_id,
+        fullName: user?.full_name,
+        hasDeviceToken: hasToken,
+        deviceTokenPreview: hasToken ? `${user.device_token.substring(0, 20)}...` : null,
+        isFirebaseConfigured: isConfigured,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// POST /api/users/me/test-push — bắn thử 1 thông báo tới thiết bị của chính người dùng hiện tại
+async function sendSelfTestPush(req, res, next) {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user || !user.device_token || !user.device_token.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tài khoản chưa có device_token trong database. Hãy mở app trên điện thoại và đăng nhập lại.',
+      });
+    }
+
+    const { sendPushNotification } = require('../services/fcm_service');
+    const result = await sendPushNotification(user.device_token, {
+      title: '🔔 Thử Nghiệm Thông Báo Thư Viện',
+      body: `Xin chào ${user.full_name}! Hệ thống thông báo đẩy (FCM) đã được kết nối và hoạt động tốt.`,
+      data: {
+        type: 'TEST_PUSH',
+        timestamp: new Date().toISOString(),
+      },
+    });
+
+    res.json({
+      success: result.success,
+      message: result.success
+        ? 'Đã gửi thông báo thử nghiệm thành công'
+        : `Gửi thông báo thất bại: ${result.message || result.reason || result.error}`,
+      result,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = {
+  getMe,
+  getMyQr,
+  updateMe,
+  registerDevice,
+  getFcmStatus,
+  sendSelfTestPush,
+};

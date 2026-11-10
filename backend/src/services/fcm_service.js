@@ -13,7 +13,14 @@ function initFirebase() {
   // 1. Ưu tiên nạp từ biến môi trường JSON (Rất tiện lợi khi deploy Render/Cloud)
   if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
     try {
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+      const rawEnv = process.env.FIREBASE_SERVICE_ACCOUNT_JSON.trim();
+      // Hỗ trợ cả chuỗi JSON thuần và chuỗi Base64
+      if (rawEnv.startsWith('{')) {
+        serviceAccount = JSON.parse(rawEnv);
+      } else {
+        const decoded = Buffer.from(rawEnv, 'base64').toString('utf-8');
+        serviceAccount = JSON.parse(decoded);
+      }
     } catch (e) {
       console.warn('[FCM] Không thể parse FIREBASE_SERVICE_ACCOUNT_JSON:', e.message);
     }
@@ -51,14 +58,25 @@ function initFirebase() {
   }
 }
 
+function isFirebaseConfigured() {
+  const fcmAdmin = initFirebase();
+  return Boolean(fcmAdmin);
+}
+
 async function sendPushNotification(deviceToken, { title, body, data = {} }) {
   if (!deviceToken || typeof deviceToken !== 'string' || !deviceToken.trim()) {
-    return { success: false, reason: 'NO_DEVICE_TOKEN' };
+    console.warn('[FCM] sendPushNotification gọi nhưng không có deviceToken');
+    return { success: false, reason: 'NO_DEVICE_TOKEN', message: 'deviceToken trống hoặc không hợp lệ' };
   }
 
   const fcmAdmin = initFirebase();
   if (!fcmAdmin) {
-    return { success: false, reason: 'FIREBASE_NOT_CONFIGURED' };
+    console.warn('[FCM] Chưa cấu hình Firebase Admin SDK (thiếu FIREBASE_SERVICE_ACCOUNT_JSON hoặc file JSON)');
+    return {
+      success: false,
+      reason: 'FIREBASE_NOT_CONFIGURED',
+      message: 'Hệ thống chưa nạp được cấu hình Firebase (kiểm tra FIREBASE_SERVICE_ACCOUNT_JSON trên Render)',
+    };
   }
 
   const message = {
@@ -144,9 +162,13 @@ async function sendCardStatusNotification(user, status, reason = '') {
 }
 
 async function sendForceCheckOutNotification(user, log, staffName = 'Thủ thư') {
-  if (!user || !user.device_token) {
-    console.log(`[FCM] Không thể gửi push mời ra: User ${user?.student_id || ''} chưa có device_token`);
-    return;
+  if (!user || !user.device_token || !user.device_token.trim()) {
+    console.log(`[FCM] Không thể gửi push mời ra: User ${user?.student_id || ''} chưa có device_token trong database`);
+    return {
+      success: false,
+      reason: 'NO_DEVICE_TOKEN',
+      message: `Sinh viên ${user?.student_id || ''} chưa đăng ký thiết bị nhận thông báo (cần đăng nhập app trên điện thoại)`,
+    };
   }
   const duration = log && log.total_minutes ? log.total_minutes : 0;
   const title = 'Thông Báo: Bạn Đã Được Mời Rời Thư Viện';
@@ -166,6 +188,7 @@ async function sendForceCheckOutNotification(user, log, staffName = 'Thủ thư'
 }
 
 module.exports = {
+  isFirebaseConfigured,
   sendPushNotification,
   sendCheckInNotification,
   sendCardStatusNotification,

@@ -494,9 +494,14 @@ async function forceCheckOutUser(req, res, next) {
 
     // Bắn thông báo Push Notification qua FCM tới điện thoại sinh viên
     const staffName = req.user?.full_name || 'Thủ thư';
-    sendForceCheckOutNotification(user, activeLog, staffName).catch((e) =>
-      console.warn('[FCM] Error sending force checkout push:', e.message)
-    );
+    let pushNotificationResult = null;
+    try {
+      pushNotificationResult = await sendForceCheckOutNotification(user, activeLog, staffName);
+      console.log(`[FCM] Kết quả gửi push mời ra cho ${user.student_id}:`, pushNotificationResult);
+    } catch (pushErr) {
+      console.warn(`[FCM] Lỗi ngoại lệ khi gửi push mời ra: ${pushErr.message}`);
+      pushNotificationResult = { success: false, error: pushErr.message };
+    }
 
     res.json({
       success: true,
@@ -505,6 +510,7 @@ async function forceCheckOutUser(req, res, next) {
         userId: user._id,
         checkOutTime: now,
         durationMinutes: activeLog?.total_minutes || 0,
+        pushNotification: pushNotificationResult,
       },
     });
   } catch (err) {

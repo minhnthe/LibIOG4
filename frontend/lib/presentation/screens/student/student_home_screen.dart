@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/fcm_service.dart';
 import '../../bloc/auth/auth_bloc.dart';
 
 class StudentHomeScreen extends StatefulWidget {
@@ -34,6 +35,17 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       final authState = context.read<AuthBloc>().state;
       final token = authState is Authenticated ? authState.token : null;
       _fetchQr(token: token);
+
+      // Đảm bảo FCM device token luôn được đồng bộ lên MongoDB cho sinh viên
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+        FirebaseMessaging.instance.getToken().then((fcmToken) {
+          if (fcmToken != null && fcmToken.isNotEmpty) {
+            FcmService.registerDeviceToken(deviceToken: fcmToken, authToken: token);
+          }
+        }).catchError((e) {
+          debugPrint('[FCM] Lỗi lấy token trong StudentHomeScreen: $e');
+        });
+      }
     });
 
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
@@ -43,11 +55,56 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           if (type == 'CHECK_IN_SUCCESS') {
             if (mounted) setState(() => _isInside = true);
           } else if (type == 'CHECK_OUT_SUCCESS' || type == 'FORCE_CHECK_OUT') {
-            if (mounted) setState(() => _isInside = false);
+            if (mounted) {
+              setState(() => _isInside = false);
+              if (type == 'FORCE_CHECK_OUT') {
+                _showForceCheckOutDialog(
+                  message.notification?.body ?? 'Thủ thư đã thực hiện mời bạn rời khỏi thư viện.',
+                );
+              }
+            }
           }
         });
       } catch (_) {}
     }
+  }
+
+  void _showForceCheckOutDialog(String content) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 28),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Mời Rời Thư Viện',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          content,
+          style: const TextStyle(fontSize: 15, height: 1.4),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('ĐÃ HIỂU'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
