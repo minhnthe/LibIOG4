@@ -39,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final user = UserModel.fromJson(userData);
         ApiClient.setToken(token);
         AdminRemoteDataSource.setAuthToken(token);
+        FcmService.syncCachedTokenAfterLogin(token);
         emit(Authenticated(user: user, token: token));
         return;
       }

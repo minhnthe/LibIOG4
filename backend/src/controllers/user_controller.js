@@ -73,6 +73,8 @@ async function getMyQr(req, res, next) {
         expiresIn: 60,
         cardExpiry: card.expiry_date,
         status: card.status,
+        isInside: Boolean(user.is_inside),
+        isInsideLibrary: Boolean(user.is_inside),
       },
     });
   } catch (err) {

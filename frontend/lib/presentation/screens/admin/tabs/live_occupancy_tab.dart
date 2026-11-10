@@ -367,13 +367,6 @@ class _LiveOccupancyTabState extends State<LiveOccupancyTab> {
                   label: 'Tổng lượt vào hôm nay',
                   value: '$totalVisitsToday lượt',
                 ),
-                Container(width: 1, height: 35, color: Colors.grey.withValues(alpha: 0.3)),
-                _buildStatItem(
-                  theme: theme,
-                  icon: Icons.trending_up_rounded,
-                  label: 'Lượt cao điểm nhất',
-                  value: '$peakOccupancy người',
-                ),
               ],
             ),
           ],

@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
@@ -21,6 +24,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   Timer? _timer;
+  bool? _isInside;
+  StreamSubscription<RemoteMessage>? _fcmSubscription;
 
   @override
   void initState() {
@@ -30,10 +35,24 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       final token = authState is Authenticated ? authState.token : null;
       _fetchQr(token: token);
     });
+
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        _fcmSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          final type = message.data['type'];
+          if (type == 'CHECK_IN_SUCCESS') {
+            if (mounted) setState(() => _isInside = true);
+          } else if (type == 'CHECK_OUT_SUCCESS' || type == 'FORCE_CHECK_OUT') {
+            if (mounted) setState(() => _isInside = false);
+          }
+        });
+      } catch (_) {}
+    }
   }
 
   @override
   void dispose() {
+    _fcmSubscription?.cancel();
     _timer?.cancel();
     super.dispose();
   }
@@ -64,13 +83,48 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       final body = jsonDecode(res.body) as Map<String, dynamic>;
       if (res.statusCode == 200 && body['success'] == true) {
         final data = body['data'] as Map<String, dynamic>;
+        final rawInside = data['isInside'] ?? data['isInsideLibrary'];
+        bool? parsedInside;
+        if (rawInside != null) {
+          parsedInside = rawInside == true;
+        }
+
         if (!mounted) return;
         setState(() {
           _qrPayload = data['qrPayload']?.toString();
           _countdown = (data['expiresIn'] as num?)?.toInt() ?? 60;
+          if (parsedInside != null) {
+            _isInside = parsedInside;
+          }
           _isLoading = false;
         });
         _startTimer();
+
+        // Đồng bộ thêm với /api/checkin/current-status nếu backend chưa có trường isInside
+        if (parsedInside == null && authToken != null && authToken.isNotEmpty) {
+          try {
+            final statusRes = await http.get(
+              Uri.parse(AppConstants.checkinStatusEndpoint),
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer $authToken',
+              },
+            );
+            if (statusRes.statusCode == 200) {
+              final statusBody = jsonDecode(statusRes.body) as Map<String, dynamic>;
+              if (statusBody['success'] == true && statusBody['data'] != null) {
+                final statusData = statusBody['data'] as Map<String, dynamic>;
+                final inside = statusData['isInside'] == true || statusData['isInsideLibrary'] == true;
+                if (mounted) {
+                  setState(() {
+                    _isInside = inside;
+                  });
+                }
+              }
+            }
+          } catch (_) {}
+        }
       } else {
         if (!mounted) return;
         setState(() {
@@ -137,6 +191,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final user = state is Authenticated ? state.user : null;
+        final isInside = _isInside ?? (user?.isInside == true);
 
         return Scaffold(
           backgroundColor: const Color(0xFFF5F7FA),
@@ -200,28 +255,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Chip(
-                                    backgroundColor: user?.isInside == true
+                                    backgroundColor: isInside
                                         ? Colors.green.shade100
                                         : Colors.grey.shade200,
                                     label: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(
-                                          user?.isInside == true
+                                          isInside
                                               ? Icons.login_rounded
                                               : Icons.logout_rounded,
                                           size: 16,
-                                          color: user?.isInside == true
+                                          color: isInside
                                               ? Colors.green.shade800
                                               : Colors.grey.shade800,
                                         ),
                                         const SizedBox(width: 6),
                                         Text(
-                                          user?.isInside == true
+                                          isInside
                                               ? 'Đang ở trong thư viện (Quẹt để ra)'
                                               : 'Đang ở bên ngoài (Quẹt để vào)',
                                           style: TextStyle(
-                                            color: user?.isInside == true
+                                            color: isInside
                                               ? Colors.green.shade800
                                               : Colors.grey.shade800,
                                             fontWeight: FontWeight.w600,

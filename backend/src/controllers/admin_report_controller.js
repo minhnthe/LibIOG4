@@ -1,6 +1,7 @@
 const CheckInLog = require('../models/check_in_log_model');
 const User = require('../models/user_model');
 const SystemConfig = require('../models/system_config_model');
+const { sendForceCheckOutNotification } = require('../services/fcm_service');
 const {
   autoPromoteOperatingHours,
   resolveOperatingHoursForDate,
@@ -490,6 +491,12 @@ async function forceCheckOutUser(req, res, next) {
 
     user.is_inside = false;
     await user.save();
+
+    // Bắn thông báo Push Notification qua FCM tới điện thoại sinh viên
+    const staffName = req.user?.full_name || 'Thủ thư';
+    sendForceCheckOutNotification(user, activeLog, staffName).catch((e) =>
+      console.warn('[FCM] Error sending force checkout push:', e.message)
+    );
 
     res.json({
       success: true,

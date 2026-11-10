@@ -143,8 +143,31 @@ async function sendCardStatusNotification(user, status, reason = '') {
   });
 }
 
+async function sendForceCheckOutNotification(user, log, staffName = 'Thủ thư') {
+  if (!user || !user.device_token) {
+    console.log(`[FCM] Không thể gửi push mời ra: User ${user?.student_id || ''} chưa có device_token`);
+    return;
+  }
+  const duration = log && log.total_minutes ? log.total_minutes : 0;
+  const title = 'Thông Báo: Bạn Đã Được Mời Rời Thư Viện';
+  const body = `${staffName} đã thực hiện mời bạn rời khỏi thư viện. Thời gian lưu trú: ${duration} phút. Hẹn gặp lại bạn!`;
+
+  return sendPushNotification(user.device_token, {
+    title,
+    body,
+    data: {
+      type: 'FORCE_CHECK_OUT',
+      studentId: user.student_id,
+      timestamp: (log?.check_out_time || new Date()).toISOString(),
+      logId: log?._id ? log._id.toString() : '',
+      durationMinutes: String(duration),
+    },
+  });
+}
+
 module.exports = {
   sendPushNotification,
   sendCheckInNotification,
   sendCardStatusNotification,
+  sendForceCheckOutNotification,
 };

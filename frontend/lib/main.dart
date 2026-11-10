@@ -56,7 +56,8 @@ void main() async {
         final notification = message.notification;
         if (notification != null) {
           final isAlert = message.data['type'] == 'CARD_BLOCKED' ||
-              message.data['type'] == 'LIBRARY_CLOSING_ALERT';
+              message.data['type'] == 'LIBRARY_CLOSING_ALERT' ||
+              message.data['type'] == 'FORCE_CHECK_OUT';
           rootScaffoldMessengerKey.currentState?.showSnackBar(
             SnackBar(
               behavior: SnackBarBehavior.floating,
