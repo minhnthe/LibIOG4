@@ -205,9 +205,38 @@ function resolveOperatingHoursForDate(configMap, targetDate = new Date()) {
   };
 }
 
+/**
+ * Lấy các phần tử giờ, phút, giây và thứ theo múi giờ Việt Nam (Asia/Ho_Chi_Minh)
+ * @param {Date|string|number} date
+ * @returns {{ hour: number, minute: number, second: number, weekday: string }}
+ */
+function getVNTimeParts(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hourCycle: 'h23',
+    weekday: 'short',
+  });
+  const parts = formatter.formatToParts(d);
+  const map = {};
+  for (const p of parts) {
+    map[p.type] = p.value;
+  }
+  return {
+    hour: parseInt(map.hour || '0', 10),
+    minute: parseInt(map.minute || '0', 10),
+    second: parseInt(map.second || '0', 10),
+    weekday: map.weekday, // 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'
+  };
+}
+
 module.exports = {
   getVNDateString,
   getVNTomorrowString,
+  getVNTimeParts,
   formatVNDisplayDate,
   normalizeTimeStr,
   autoPromoteOperatingHours,

@@ -291,7 +291,6 @@ class _UserManagementTabState extends State<UserManagementTab> {
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         IconButton(
-                          tooltip: 'Làm mới',
                           icon: const Icon(Icons.refresh_rounded),
                           onPressed: () {
                             context.read<UserManagementBloc>().add(

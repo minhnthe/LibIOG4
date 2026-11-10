@@ -75,34 +75,57 @@ async function bootstrapDemoAccounts() {
       });
     }
 
-    // 3. Thủ thư (LIB01)
-    let libDoc = await User.findOne({
-      $or: [{ student_id: 'LIB01' }, { email: 'librarian@library.edu.vn' }],
-    });
-    if (libDoc) {
-      libDoc.student_id = 'LIB01';
-      libDoc.full_name = 'Trần Văn Thủ Thư';
-      libDoc.email = 'librarian@library.edu.vn';
-      libDoc.password_hash = libPassHash;
-      libDoc.phone = '0907654321';
-      libDoc.role_id = roleMap['LIBRARIAN'];
-      libDoc.status = 'ACTIVE';
-      libDoc.is_inside = false;
-      libDoc.deleted_at = null;
-      libDoc.updated_at = new Date();
-      await libDoc.save();
-    } else {
-      libDoc = await User.create({
+    // 3. 3 Thủ thư (LIB01, LIB02, LIB03)
+    const librarians = [
+      {
         student_id: 'LIB01',
         full_name: 'Trần Văn Thủ Thư',
         email: 'librarian@library.edu.vn',
-        password_hash: libPassHash,
         phone: '0907654321',
-        role_id: roleMap['LIBRARIAN'],
-        status: 'ACTIVE',
-        is_inside: false,
-        deleted_at: null,
+      },
+      {
+        student_id: 'LIB02',
+        full_name: 'Nguyễn Thị Hương Thư',
+        email: 'librarian02@library.edu.vn',
+        phone: '0907654322',
+      },
+      {
+        student_id: 'LIB03',
+        full_name: 'Lê Minh Thảo',
+        email: 'librarian03@library.edu.vn',
+        phone: '0907654323',
+      },
+    ];
+
+    for (const lib of librarians) {
+      let libDoc = await User.findOne({
+        $or: [{ student_id: lib.student_id }, { email: lib.email }],
       });
+      if (libDoc) {
+        libDoc.student_id = lib.student_id;
+        libDoc.full_name = lib.full_name;
+        libDoc.email = lib.email;
+        libDoc.password_hash = libPassHash;
+        libDoc.phone = lib.phone;
+        libDoc.role_id = roleMap['LIBRARIAN'];
+        libDoc.status = 'ACTIVE';
+        libDoc.is_inside = false;
+        libDoc.deleted_at = null;
+        libDoc.updated_at = new Date();
+        await libDoc.save();
+      } else {
+        await User.create({
+          student_id: lib.student_id,
+          full_name: lib.full_name,
+          email: lib.email,
+          password_hash: libPassHash,
+          phone: lib.phone,
+          role_id: roleMap['LIBRARIAN'],
+          status: 'ACTIVE',
+          is_inside: false,
+          deleted_at: null,
+        });
+      }
     }
 
     // 4. Sinh viên mẫu (HE190001)
@@ -152,7 +175,7 @@ async function bootstrapDemoAccounts() {
       );
     }
 
-    console.log('Demo accounts bootstrap completed: ADMIN01, LIB01, HE190001 ready.');
+    console.log('Demo accounts bootstrap completed: ADMIN01, LIB01..LIB03, HE190001 ready.');
   } catch (err) {
     console.error('Error bootstrapping demo accounts:', err.message);
   }

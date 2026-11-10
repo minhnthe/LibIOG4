@@ -297,7 +297,6 @@ class _ReportAnalyticsTabState extends State<ReportAnalyticsTab> {
 
                 // Nút Làm mới
                 IconButton(
-                  tooltip: 'Làm mới dữ liệu',
                   icon: isLoading
                       ? const SizedBox(
                           width: 18,

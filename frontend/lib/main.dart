@@ -126,6 +126,11 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
+          tooltipTheme: const TooltipThemeData(
+            triggerMode: TooltipTriggerMode.manual,
+            waitDuration: Duration.zero,
+            showDuration: Duration.zero,
+          ),
         ),
         home: const AuthWrapper(),
         routes: {

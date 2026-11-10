@@ -65,22 +65,38 @@ async function validateCheckIn(user, card, config) {
     };
   }
 
-  // 3. Giờ mở cửa có hiệu lực của ngày hôm nay
+  // 3. Giờ mở cửa có hiệu lực của ngày hôm nay theo múi giờ Việt Nam (+07:00 ICT)
   const now = new Date();
   const { openTime: openTimeStr, closeTime: closeTimeStr } = resolveOperatingHoursForDate(config, now);
+
+  const vnTimeStr = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(now);
+  const [currentH, currentM] = vnTimeStr.split(':').map(Number);
+  const currentMinutes = currentH * 60 + currentM;
+
   const [openH, openM] = openTimeStr.split(':').map(Number);
+  const openMinutes = openH * 60 + openM;
+
   const [closeH, closeM] = closeTimeStr.split(':').map(Number);
-  const todayOpen = new Date(now); todayOpen.setHours(openH, openM, 0, 0);
-  const todayClose = new Date(now); todayClose.setHours(closeH, closeM, 0, 0);
-  if (now < todayOpen || now > todayClose) {
+  const closeMinutes = closeH * 60 + closeM;
+
+  if (currentMinutes < openMinutes || currentMinutes > closeMinutes) {
     return { ok: false, errorCode: 'LIBRARY_CLOSED', message: `Thư viện chỉ mở cửa ${openTimeStr} – ${closeTimeStr}` };
   }
 
-  // 4. Ngày mở cửa trong tuần
-  const dayMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // 4. Ngày mở cửa trong tuần theo múi giờ Việt Nam
+  const vnWeekday = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    weekday: 'short',
+  }).format(now); // 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+
   const allowedDaysStr = config.ALLOWED_DAYS || config.allowedDays || 'Mon,Tue,Wed,Thu,Fri,Sat';
   const allowedDays = allowedDaysStr.split(',').map((d) => d.trim());
-  if (!allowedDays.includes(dayMap[now.getDay()])) {
+  if (!allowedDays.includes(vnWeekday)) {
     return { ok: false, errorCode: 'LIBRARY_CLOSED', message: 'Thư viện không mở cửa ngày hôm nay' };
   }
 
@@ -176,7 +192,7 @@ async function checkIn(req, res, next) {
       }).sort({ check_in_time: -1 });
 
       const now = new Date();
-      if (activeLog && activeLog.check_in_time.toDateString() !== now.toDateString()) {
+      if (activeLog && getVNDateString(activeLog.check_in_time) !== getVNDateString(now)) {
         const { closeTime: activeCloseTime } = resolveOperatingHoursForDate(config, activeLog.check_in_time);
         const [closeH, closeM] = activeCloseTime.split(':').map(Number);
         const autoClose = new Date(activeLog.check_in_time);

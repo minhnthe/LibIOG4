@@ -21,6 +21,31 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _currentIndex = 0;
+  late final ConfigBloc _configBloc;
+  late final RealtimeBloc _realtimeBloc;
+  late final ScannerBloc _scannerBloc;
+  late final UserManagementBloc _userManagementBloc;
+  late final ReportBloc _reportBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _configBloc = ConfigBloc();
+    _realtimeBloc = RealtimeBloc();
+    _scannerBloc = ScannerBloc();
+    _userManagementBloc = UserManagementBloc();
+    _reportBloc = ReportBloc();
+  }
+
+  @override
+  void dispose() {
+    _configBloc.close();
+    _realtimeBloc.close();
+    _scannerBloc.close();
+    _userManagementBloc.close();
+    _reportBloc.close();
+    super.dispose();
+  }
 
   final List<Widget> _tabs = const [
     LiveOccupancyTab(),
@@ -58,11 +83,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ConfigBloc()),
-        BlocProvider(create: (_) => RealtimeBloc()),
-        BlocProvider(create: (_) => ScannerBloc()),
-        BlocProvider(create: (_) => UserManagementBloc()),
-        BlocProvider(create: (_) => ReportBloc()),
+        BlocProvider.value(value: _configBloc),
+        BlocProvider.value(value: _realtimeBloc),
+        BlocProvider.value(value: _scannerBloc),
+        BlocProvider.value(value: _userManagementBloc),
+        BlocProvider.value(value: _reportBloc),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -104,7 +129,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       ),
                     IconButton(
                       icon: const Icon(Icons.logout_rounded),
-                      tooltip: 'Đăng xuất',
                       onPressed: () => _confirmLogout(context),
                     ),
                   ],
@@ -125,22 +149,27 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard_rounded),
               label: 'Live Occupancy',
+              tooltip: '',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.qr_code_scanner_rounded),
               label: 'Trạm quét QR',
+              tooltip: '',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.people_alt_rounded),
               label: 'Thành viên',
+              tooltip: '',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings_rounded),
               label: 'Cấu hình',
+              tooltip: '',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),
               label: 'Thống kê',
+              tooltip: '',
             ),
           ],
         ),

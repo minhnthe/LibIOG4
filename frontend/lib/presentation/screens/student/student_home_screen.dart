@@ -147,7 +147,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout_rounded),
-                tooltip: 'Đăng xuất',
                 onPressed: () => _confirmLogout(context),
               ),
             ],
@@ -336,7 +335,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                         QrImageView(
                                           data: _qrPayload!,
                                           version: QrVersions.auto,
-                                          size: 160,
+                                          size: 220,
+                                          padding: const EdgeInsets.all(8),
+                                          backgroundColor: Colors.white,
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
@@ -365,7 +366,6 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                             IconButton(
                                               visualDensity: VisualDensity.compact,
                                               iconSize: 18,
-                                              tooltip: 'Làm mới ngay',
                                               icon: const Icon(Icons.refresh_rounded),
                                               onPressed: () => _fetchQr(),
                                             ),

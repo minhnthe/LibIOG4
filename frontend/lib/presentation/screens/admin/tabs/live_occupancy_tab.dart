@@ -182,7 +182,6 @@ class _LiveOccupancyTabState extends State<LiveOccupancyTab> {
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Làm mới ngay',
                           onPressed: () {
                             context.read<RealtimeBloc>().add(const FetchRealtimeDataEvent());
                           },

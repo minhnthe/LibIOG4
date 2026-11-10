@@ -18,49 +18,94 @@ class _QrScannerTabState extends State<QrScannerTab> {
   MobileScannerController? _cameraController;
   bool _isCameraActive = false;
   bool _isDialogOpen = false;
+  bool _isScanningLocked = false;
+  bool _isTorchOn = false;
 
   @override
   void initState() {
     super.initState();
-    // Default camera disabled on desktop/web unless user activates it
+    // Default camera active on mobile platforms
     if (!kIsWeb && defaultTargetPlatform != TargetPlatform.windows && defaultTargetPlatform != TargetPlatform.linux) {
-      _isCameraActive = true;
-      _cameraController = MobileScannerController();
+      _startCamera();
     }
   }
 
   @override
   void dispose() {
     _inputController.dispose();
-    _cameraController?.dispose();
+    _stopCamera();
     super.dispose();
   }
 
+  void _startCamera() {
+    try {
+      _cameraController?.dispose();
+    } catch (_) {}
+
+    _cameraController = MobileScannerController(
+      detectionSpeed: DetectionSpeed.normal,
+      detectionTimeoutMs: 1000,
+      formats: const [BarcodeFormat.qrCode],
+      cameraResolution: const Size(1280, 720),
+      facing: CameraFacing.back,
+      torchEnabled: _isTorchOn,
+    );
+
+    if (mounted) {
+      setState(() {
+        _isCameraActive = true;
+        _isScanningLocked = false;
+      });
+    }
+  }
+
+  void _stopCamera() {
+    try {
+      _cameraController?.dispose();
+    } catch (_) {}
+    _cameraController = null;
+
+    if (mounted) {
+      setState(() {
+        _isCameraActive = false;
+        _isScanningLocked = false;
+      });
+    }
+  }
+
   void _toggleCamera() {
-    setState(() {
-      _isCameraActive = !_isCameraActive;
-      if (_isCameraActive) {
-        _cameraController ??= MobileScannerController();
-        _cameraController?.start();
-      } else {
-        _cameraController?.stop();
-      }
-    });
+    if (_isCameraActive) {
+      _stopCamera();
+    } else {
+      _startCamera();
+    }
+  }
+
+  void _toggleTorch() {
+    if (_cameraController != null && _isCameraActive) {
+      _cameraController!.toggleTorch();
+      setState(() {
+        _isTorchOn = !_isTorchOn;
+      });
+    }
   }
 
   void _submitCode([String? text]) {
     final code = (text ?? _inputController.text).trim();
     if (code.isNotEmpty) {
       context.read<ScannerBloc>().add(ProcessQrCodeEvent(code));
+    } else {
+      _isScanningLocked = false;
     }
   }
 
   void _onDetect(BarcodeCapture capture) {
-    if (_isDialogOpen) return;
+    if (_isDialogOpen || _isScanningLocked) return;
     final List<Barcode> barcodes = capture.barcodes;
     for (final barcode in barcodes) {
       final val = barcode.rawValue;
       if (val != null && val.isNotEmpty) {
+        _isScanningLocked = true;
         _submitCode(val);
         break;
       }
@@ -165,6 +210,7 @@ class _QrScannerTabState extends State<QrScannerTab> {
                 onPressed: () {
                   Navigator.of(dialogCtx).pop();
                   _isDialogOpen = false;
+                  _isScanningLocked = false;
                   _inputController.clear();
                   scannerBloc.add(const ResetScannerEvent());
                 },
@@ -176,6 +222,7 @@ class _QrScannerTabState extends State<QrScannerTab> {
       ),
     ).then((_) {
       _isDialogOpen = false;
+      _isScanningLocked = false;
       scannerBloc.add(const ResetScannerEvent());
     });
   }
@@ -292,6 +339,15 @@ class _QrScannerTabState extends State<QrScannerTab> {
                                 style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               const Spacer(),
+                              if (_isCameraActive)
+                                IconButton(
+                                  onPressed: _toggleTorch,
+                                  icon: Icon(
+                                    _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                                    color: _isTorchOn ? Colors.amber.shade700 : Colors.grey.shade600,
+                                    size: 20,
+                                  ),
+                                ),
                               TextButton.icon(
                                 onPressed: _toggleCamera,
                                 icon: Icon(_isCameraActive ? Icons.videocam_off_rounded : Icons.videocam_rounded, size: 18),
@@ -310,6 +366,46 @@ class _QrScannerTabState extends State<QrScannerTab> {
                                 MobileScanner(
                                   controller: _cameraController,
                                   onDetect: _onDetect,
+                                  errorBuilder: (context, error, child) {
+                                    String errorMsg = 'Không thể khởi động camera';
+                                    if (error.errorCode == MobileScannerErrorCode.permissionDenied) {
+                                      errorMsg = 'Ứng dụng chưa được cấp quyền Camera.\nVui lòng cấp quyền trong Cài đặt hoặc nhấn Thử lại.';
+                                    } else if (error.errorCode == MobileScannerErrorCode.unsupported) {
+                                      errorMsg = 'Thiết bị không hỗ trợ tính năng quét camera.';
+                                    } else {
+                                      errorMsg = 'Lỗi camera: ${error.errorDetails?.message ?? error.errorCode.name}';
+                                    }
+
+                                    return Container(
+                                      color: Colors.black87,
+                                      padding: const EdgeInsets.all(20),
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.videocam_off_rounded, color: Colors.amberAccent, size: 44),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            errorMsg,
+                                            style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(height: 16),
+                                          ElevatedButton.icon(
+                                            onPressed: _startCamera,
+                                            icon: const Icon(Icons.refresh_rounded, size: 18),
+                                            label: const Text('Thử lại / Cấp quyền', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: theme.colorScheme.primary,
+                                              foregroundColor: Colors.white,
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
                                 // Scanning Overlay Box
                                 Container(
