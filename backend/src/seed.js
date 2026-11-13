@@ -10,13 +10,50 @@ const LibraryCard = require('./models/library_card_model');
 const CheckInLog = require('./models/check_in_log_model');
 const SystemConfig = require('./models/system_config_model');
 
+const cliArgs = process.argv.slice(2);
+const fullSeed = cliArgs.includes('--full');
+const cliMongoUri = cliArgs.find((arg) => !arg.startsWith('--'));
+
 // Ưu tiên: tham số dòng lệnh -> biến môi trường MONGODB_URI -> mongodb local
 const MONGODB_URI =
-  process.argv[2] ||
+  cliMongoUri ||
   process.env.MONGODB_URI ||
   'mongodb://127.0.0.1:27017/library_access_system';
 
 const SALT_ROUNDS = 10;
+
+async function activateExistingStudentsOnly() {
+  const studentRole = await Role.findOne({ role_name: 'STUDENT' }).select('_id');
+  if (!studentRole) {
+    throw new Error('Không tìm thấy role STUDENT. Hãy chạy seed đầy đủ bằng tham số --full trước.');
+  }
+
+  const students = await User.find({
+    role_id: studentRole._id,
+    deleted_at: null,
+  })
+    .sort({ student_id: 1 })
+    .limit(80)
+    .select('_id student_id full_name is_inside')
+    .lean();
+
+  if (students.length < 80) {
+    throw new Error(
+      `Chỉ tìm thấy ${students.length} sinh viên hiện có, không đủ 80 sinh viên để cập nhật. Không có dữ liệu nào bị thay đổi.`
+    );
+  }
+
+  const studentIds = students.map((student) => student._id);
+  const result = await User.collection.updateMany(
+    { _id: { $in: studentIds } },
+    { $set: { is_inside: true } }
+  );
+
+  console.log('--- Chế độ chỉ cập nhật trạng thái hiện diện ---');
+  console.log(`- Đã cập nhật ${result.modifiedCount} sinh viên: is_inside = true`);
+  console.log('- Không thay đổi hồ sơ, mật khẩu, role, thẻ, cấu hình, cổng hoặc log.');
+  console.log(`- Phạm vi: ${students[0].student_id} -> ${students[students.length - 1].student_id}`);
+}
 
 async function seed() {
   console.log('====================================================');
@@ -25,6 +62,14 @@ async function seed() {
 
   await mongoose.connect(MONGODB_URI);
   console.log('MongoDB connected successfully.\n');
+
+  if (!fullSeed) {
+    await activateExistingStudentsOnly();
+    await mongoose.disconnect();
+    return;
+  }
+
+  console.log('Đang chạy chế độ seed đầy đủ (--full).\n');
 
   // Dọn dẹp index cũ v1 gây lỗi trùng lặp studentId_1 hoặc username_1 nếu có
   try {

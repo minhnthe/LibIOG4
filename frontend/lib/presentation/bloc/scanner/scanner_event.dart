@@ -9,11 +9,12 @@ abstract class ScannerEvent extends Equatable {
 
 class ProcessQrCodeEvent extends ScannerEvent {
   final String rawCode;
+  final String? deviceId;
 
-  const ProcessQrCodeEvent(this.rawCode);
+  const ProcessQrCodeEvent(this.rawCode, {this.deviceId});
 
   @override
-  List<Object?> get props => [rawCode];
+  List<Object?> get props => [rawCode, deviceId];
 }
 
 class ResetScannerEvent extends ScannerEvent {

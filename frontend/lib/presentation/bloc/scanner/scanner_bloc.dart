@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+
 import '../../../../data/models/checkin_result_model.dart';
 import '../../../../data/repositories/admin_repository_impl.dart';
 import '../../../../domain/repositories/admin_repository.dart';
@@ -11,8 +12,8 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   final AdminRepository adminRepository;
 
   ScannerBloc({AdminRepository? adminRepository})
-      : adminRepository = adminRepository ?? AdminRepositoryImpl(),
-        super(const ScannerIdle()) {
+    : adminRepository = adminRepository ?? AdminRepositoryImpl(),
+      super(const ScannerIdle()) {
     on<ProcessQrCodeEvent>(_onProcessQrCode);
     on<ResetScannerEvent>((event, emit) => emit(const ScannerIdle()));
   }
@@ -23,13 +24,18 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   ) async {
     final raw = event.rawCode.trim();
     if (raw.isEmpty) {
-      emit(const ScannerFailed('Vui lòng nhập mã sinh viên hoặc quét QR hợp lệ'));
+      emit(
+        const ScannerFailed('Vui lòng nhập mã sinh viên hoặc quét QR hợp lệ'),
+      );
       return;
     }
 
     emit(const ScannerProcessing());
     try {
-      final result = await adminRepository.processScan(raw);
+      final result = await adminRepository.processScan(
+        raw,
+        deviceId: event.deviceId,
+      );
       emit(ScannerSuccess(result));
     } catch (e) {
       final errString = e.toString().replaceFirst('Exception: ', '');
