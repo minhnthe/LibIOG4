@@ -31,3 +31,22 @@ class ToggleUserStatusEvent extends UserManagementEvent {
   @override
   List<Object?> get props => [userId, currentStatus, studentName];
 }
+
+class CreateUserEvent extends UserManagementEvent {
+  final String studentId;
+  final String name;
+  final String email;
+  final String phone;
+  final String role;
+
+  const CreateUserEvent({
+    required this.studentId,
+    required this.name,
+    required this.email,
+    this.phone = '',
+    required this.role,
+  });
+
+  @override
+  List<Object?> get props => [studentId, name, email, phone, role];
+}

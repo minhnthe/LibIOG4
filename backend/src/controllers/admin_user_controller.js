@@ -114,8 +114,15 @@ async function createUser(req, res, next) {
     // Ánh xạ role_id
     const requesterRole = (req.userRole || req.user?.role_id?.role_name || req.user?.role || '').toUpperCase();
     const targetRoleName = (role || 'STUDENT').toString().toUpperCase();
+    if (!['STUDENT', 'LIBRARIAN', 'ADMIN'].includes(targetRoleName)) {
+      return res.status(400).json({
+        success: false,
+        errorCode: 'INVALID_ROLE',
+        message: 'Vai trò tài khoản không hợp lệ',
+      });
+    }
 
-    // Thủ thư không được phép tạo tài khoản có vai trò ADMIN hoặc LIBRARIAN
+    // Chỉ ADMIN được cấp vai trò quản trị hoặc thủ thư.
     if (requesterRole !== 'ADMIN' && targetRoleName !== 'STUDENT') {
       return res.status(403).json({
         success: false,
@@ -124,9 +131,13 @@ async function createUser(req, res, next) {
       });
     }
 
-    let roleDoc = await Role.findOne({ role_name: targetRoleName });
+    const roleDoc = await Role.findOne({ role_name: targetRoleName });
     if (!roleDoc) {
-      roleDoc = await Role.findOne({ role_name: 'STUDENT' });
+      return res.status(400).json({
+        success: false,
+        errorCode: 'INVALID_ROLE',
+        message: 'Vai trò tài khoản không hợp lệ',
+      });
     }
 
     // Mật khẩu tạm: studentId + "@Lib"

@@ -7,6 +7,7 @@ import 'package:assignment/data/models/occupancy_stats_model.dart';
 import 'package:assignment/data/models/report_data_model.dart';
 import 'package:assignment/data/models/system_config_model.dart';
 import 'package:assignment/data/models/user_admin_model.dart';
+import 'package:assignment/data/models/gate_model.dart';
 
 import 'package:assignment/presentation/bloc/scanner/scanner_bloc.dart';
 import 'package:assignment/presentation/bloc/config/config_bloc.dart';
@@ -74,6 +75,25 @@ class FakeAdminRepository implements AdminRepository {
   }
 
   @override
+  Future<UserAdminModel> createUser({
+    required String studentId,
+    required String name,
+    required String email,
+    String phone = '',
+    required String role,
+  }) async {
+    return UserAdminModel(
+      id: 'created',
+      studentId: studentId,
+      name: name,
+      email: email,
+      phone: phone,
+      role: role,
+      tempPassword: '${studentId}@Lib',
+    );
+  }
+
+  @override
   Future<UserAdminModel> toggleUserStatus(String userId, String currentStatus) async {
     return const UserAdminModel(
       id: 'u1',
@@ -82,6 +102,19 @@ class FakeAdminRepository implements AdminRepository {
       email: 'a@fpt.edu.vn',
       status: 'locked',
     );
+  }
+
+  @override
+  Future<List<GateModel>> getGates() async => [];
+
+  @override
+  Future<GateModel> createGate({required String gateName, String location = ''}) async {
+    return GateModel(id: 'gate_1', gateName: gateName, location: location);
+  }
+
+  @override
+  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status}) async {
+    return GateModel(id: gateId, gateName: gateName ?? 'Cổng', status: status ?? 'ACTIVE');
   }
 
   @override

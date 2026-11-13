@@ -40,6 +40,16 @@ class UserManagementStatusUpdated extends UserManagementState {
   List<Object?> get props => [message, users];
 }
 
+class UserManagementUserCreated extends UserManagementState {
+  final UserAdminModel user;
+  final List<UserAdminModel> users;
+
+  const UserManagementUserCreated(this.user, this.users);
+
+  @override
+  List<Object?> get props => [user, users];
+}
+
 class UserManagementError extends UserManagementState {
   final String message;
   final List<UserAdminModel>? fallbackUsers;

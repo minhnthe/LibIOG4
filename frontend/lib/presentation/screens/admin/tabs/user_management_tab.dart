@@ -139,6 +139,17 @@ class _UserManagementTabState extends State<UserManagementTab> {
               duration: const Duration(seconds: 3),
             ),
           );
+        } else if (state is UserManagementUserCreated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Đã tạo ${state.user.isLibrarian ? 'tài khoản thủ thư' : 'tài khoản sinh viên'}',
+              ),
+              backgroundColor: Colors.green.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          _showTemporaryPasswordDialog(state.user);
         } else if (state is UserManagementError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -290,16 +301,30 @@ class _UserManagementTabState extends State<UserManagementTab> {
                           'Danh sách thành viên (${users.length})',
                           style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.refresh_rounded),
-                          onPressed: () {
-                            context.read<UserManagementBloc>().add(
-                                  FetchUsersEvent(
-                                    query: _searchController.text.trim(),
-                                    status: _selectedStatusFilter,
-                                  ),
-                                );
-                          },
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isCurrentAdmin || currentUser?.isLibrarian == true)
+                              FilledButton.icon(
+                                onPressed: () => _showCreateUserDialog(
+                                  context,
+                                  isCurrentAdmin: isCurrentAdmin,
+                                ),
+                                icon: const Icon(Icons.person_add_alt_1, size: 18),
+                                label: const Text('Tạo tài khoản'),
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.refresh_rounded),
+                              onPressed: () {
+                                context.read<UserManagementBloc>().add(
+                                      FetchUsersEvent(
+                                        query: _searchController.text.trim(),
+                                        status: _selectedStatusFilter,
+                                      ),
+                                    );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -341,6 +366,130 @@ class _UserManagementTabState extends State<UserManagementTab> {
         );
       },
     );
+  }
+
+  void _showTemporaryPasswordDialog(UserAdminModel user) {
+    final password = user.tempPassword;
+    if (!mounted || password == null || password.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Tạo tài khoản thành công'),
+        content: SelectableText(
+          'Tài khoản: ${user.studentId}\n'
+          'Mật khẩu tạm: $password\n\n'
+          'Hãy gửi thông tin này cho người dùng và yêu cầu đổi mật khẩu sau khi đăng nhập.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('ĐÃ HIỂU'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showCreateUserDialog(
+    BuildContext context, {
+    required bool isCurrentAdmin,
+  }) async {
+    final formKey = GlobalKey<FormState>();
+    final studentIdController = TextEditingController();
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    var selectedRole = 'STUDENT';
+
+    try {
+      await showDialog(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+          builder: (context, setDialogState) => AlertDialog(
+            title: const Text('Tạo tài khoản'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: studentIdController,
+                      decoration: const InputDecoration(labelText: 'Mã sinh viên / mã nhân viên'),
+                      validator: (value) => value == null || value.trim().isEmpty
+                          ? 'Vui lòng nhập mã tài khoản'
+                          : null,
+                    ),
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Họ và tên'),
+                      validator: (value) => value == null || value.trim().isEmpty
+                          ? 'Vui lòng nhập họ tên'
+                          : null,
+                    ),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(labelText: 'Email'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) return 'Vui lòng nhập email';
+                        if (!value.contains('@')) return 'Email không hợp lệ';
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: const InputDecoration(labelText: 'Số điện thoại (không bắt buộc)'),
+                    ),
+                    DropdownButtonFormField<String>(
+                      value: selectedRole,
+                      decoration: const InputDecoration(labelText: 'Vai trò'),
+                      items: [
+                        const DropdownMenuItem(value: 'STUDENT', child: Text('Sinh viên')),
+                        if (isCurrentAdmin)
+                          const DropdownMenuItem(value: 'LIBRARIAN', child: Text('Thủ thư')),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) setDialogState(() => selectedRole = value);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('HỦY'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  if (!formKey.currentState!.validate()) return;
+                  Navigator.of(dialogContext).pop();
+                  context.read<UserManagementBloc>().add(
+                        CreateUserEvent(
+                          studentId: studentIdController.text,
+                          name: nameController.text,
+                          email: emailController.text,
+                          phone: phoneController.text,
+                          role: selectedRole,
+                        ),
+                      );
+                },
+                child: const Text('TẠO'),
+              ),
+            ],
+          ),
+        ),
+      );
+    } finally {
+      studentIdController.dispose();
+      nameController.dispose();
+      emailController.dispose();
+      phoneController.dispose();
+    }
   }
 
   Widget _buildUserCard(

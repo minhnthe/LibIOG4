@@ -73,6 +73,7 @@ class AppConstants {
 
   // Admin management & reports endpoints
   static String get adminUsersEndpoint => '$baseUrl/admin/users';
+  static String get adminGatesEndpoint => '$baseUrl/admin/gates';
   static String get adminRealtimePresent => '$baseUrl/admin/realtime/present';
   static String get adminRealtimeStats => '$baseUrl/admin/realtime/stats';
   static String get adminReportsCheckin => '$baseUrl/admin/reports/checkin';

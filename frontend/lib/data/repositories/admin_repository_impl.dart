@@ -5,6 +5,7 @@ import '../models/occupancy_stats_model.dart';
 import '../models/report_data_model.dart';
 import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
+import '../models/gate_model.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
   final AdminRemoteDataSource remoteDataSource;
@@ -48,6 +49,23 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
+  Future<UserAdminModel> createUser({
+    required String studentId,
+    required String name,
+    required String email,
+    String phone = '',
+    required String role,
+  }) {
+    return remoteDataSource.createUser(
+      studentId: studentId,
+      name: name,
+      email: email,
+      phone: phone,
+      role: role,
+    );
+  }
+
+  @override
   Future<UserAdminModel> toggleUserStatus(String userId, String currentStatus) {
     final isLocked = currentStatus.toLowerCase() == 'locked' || currentStatus.toUpperCase() == 'BLOCKED';
     final nextStatus = isLocked ? 'active' : 'locked';
@@ -62,5 +80,23 @@ class AdminRepositoryImpl implements AdminRepository {
   @override
   Future<String> exportCsv({String? from, String? to}) {
     return remoteDataSource.exportReportCsv(from: from, to: to);
+  }
+
+  @override
+  Future<List<GateModel>> getGates() => remoteDataSource.getGates();
+
+  @override
+  Future<GateModel> createGate({required String gateName, String location = ''}) {
+    return remoteDataSource.createGate(gateName: gateName, location: location);
+  }
+
+  @override
+  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status}) {
+    return remoteDataSource.updateGate(
+      gateId,
+      gateName: gateName,
+      location: location,
+      status: status,
+    );
   }
 }

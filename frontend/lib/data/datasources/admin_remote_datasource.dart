@@ -7,6 +7,7 @@ import '../models/occupancy_stats_model.dart';
 import '../models/report_data_model.dart';
 import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
+import '../models/gate_model.dart';
 
 class AdminRemoteDataSource {
   final http.Client client;
@@ -219,6 +220,80 @@ class AdminRemoteDataSource {
     }
     final body = jsonDecode(response.body) as Map<String, dynamic>?;
     throw Exception(body?['message'] ?? 'Cập nhật trạng thái thất bại');
+  }
+
+  Future<UserAdminModel> createUser({
+    required String studentId,
+    required String name,
+    required String email,
+    String phone = '',
+    required String role,
+  }) async {
+    final response = await client.post(
+      Uri.parse(AppConstants.adminUsersEndpoint),
+      headers: await _headers(requiresAuth: true),
+      body: jsonEncode({
+        'studentId': studentId.trim(),
+        'name': name.trim(),
+        'email': email.trim(),
+        'phone': phone.trim(),
+        'role': role,
+      }),
+    );
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 201 && body['success'] == true) {
+      return UserAdminModel.fromJson(body['data'] as Map<String, dynamic>);
+    }
+    throw Exception(body['message'] ?? 'Tạo tài khoản thất bại');
+  }
+
+  Future<List<GateModel>> getGates() async {
+    final response = await client.get(
+      Uri.parse(AppConstants.adminGatesEndpoint),
+      headers: await _headers(requiresAuth: true),
+    );
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200 && body['success'] == true) {
+      final list = body['data'] as List<dynamic>? ?? [];
+      return list.map((item) => GateModel.fromJson(item as Map<String, dynamic>)).toList();
+    }
+    throw Exception(body['message'] ?? 'Không thể tải danh sách cổng');
+  }
+
+  Future<GateModel> createGate({required String gateName, String location = ''}) async {
+    final response = await client.post(
+      Uri.parse(AppConstants.adminGatesEndpoint),
+      headers: await _headers(requiresAuth: true),
+      body: jsonEncode({'gateName': gateName.trim(), 'location': location.trim()}),
+    );
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 201 && body['success'] == true) {
+      return GateModel.fromJson(body['data'] as Map<String, dynamic>);
+    }
+    throw Exception(body['message'] ?? 'Không thể tạo cổng');
+  }
+
+  Future<GateModel> updateGate(
+    String gateId, {
+    String? gateName,
+    String? location,
+    String? status,
+  }) async {
+    final payload = <String, dynamic>{};
+    if (gateName != null) payload['gateName'] = gateName.trim();
+    if (location != null) payload['location'] = location.trim();
+    if (status != null) payload['status'] = status;
+    final response = await client.patch(
+      Uri.parse('${AppConstants.adminGatesEndpoint}/$gateId'),
+      headers: await _headers(requiresAuth: true),
+      body: jsonEncode(payload),
+    );
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200 && body['success'] == true) {
+      return GateModel.fromJson(body['data'] as Map<String, dynamic>);
+    }
+    throw Exception(body['message'] ?? 'Không thể cập nhật cổng');
   }
 
   // ── Feature 5: Thống kê & Báo cáo ──

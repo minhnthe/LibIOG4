@@ -521,6 +521,14 @@ module.exports = connectDB;
 
 ### Admin Routes (`/api/admin`) — Quản trị (yêu cầu ADMIN hoặc LIBRARIAN)
 
+**Quản lý cổng / trạm quét:**
+
+| Method | Endpoint              | Auth | Role             | Mô tả                         |
+|--------|-----------------------|------|------------------|-------------------------------|
+| GET    | `/api/admin/gates`    | ✓    | LIBRARIAN, ADMIN | Xem danh sách và trạng thái cổng |
+| POST   | `/api/admin/gates`    | ✓    | ADMIN            | Tạo cổng mới                  |
+| PATCH  | `/api/admin/gates/:id`| ✓    | ADMIN            | Cập nhật tên, vị trí, trạng thái |
+
 **Quản lý thành viên:**
 
 | Method | Endpoint                        | Auth | Role             | Mô tả                      |

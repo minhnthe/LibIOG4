@@ -27,17 +27,21 @@ async function getConfigMap() {
 async function getDefaultGate(deviceId) {
   if (deviceId) {
     const gateByName = await Gate.findOne({ gate_name: deviceId });
-    if (gateByName) return gateByName;
+    if (gateByName) {
+      return gateByName.status === 'ACTIVE' ? gateByName : null;
+    }
   }
-  let gate = await Gate.findOne({ status: 'ACTIVE' });
-  if (!gate) {
-    gate = await Gate.create({
-      gate_name: 'Cổng chính',
-      location: 'Sảnh chính - Tầng 1 Nhà Thư Viện',
-      status: 'ACTIVE',
-    });
-  }
-  return gate;
+  const gate = await Gate.findOne({ status: 'ACTIVE' });
+  if (gate) return gate;
+
+  // Chỉ tự tạo cổng khi database chưa có danh mục cổng nào.
+  if (await Gate.exists({})) return null;
+
+  return Gate.create({
+    gate_name: 'Cổng chính',
+    location: 'Sảnh chính - Tầng 1 Nhà Thư Viện',
+    status: 'ACTIVE',
+  });
 }
 
 /** Kiểm tra điều kiện trước khi sinh viên check-in */
@@ -183,6 +187,13 @@ async function checkIn(req, res, next) {
 
     const config = await getConfigMap();
     const gate = await getDefaultGate(deviceId);
+    if (!gate) {
+      return res.status(422).json({
+        success: false,
+        errorCode: 'GATE_UNAVAILABLE',
+        message: 'Hiện không có cổng hoạt động để ghi nhận lượt ra vào',
+      });
+    }
 
     // ── XỬ LÝ ĐÓNG PHIÊN CŨ QUA ĐÊM (NẾU QUÊN CHECK-OUT) ──
     if (user.is_inside) {
@@ -329,6 +340,13 @@ async function syncLogs(req, res, next) {
     }
 
     const defaultGate = await getDefaultGate();
+    if (!defaultGate) {
+      return res.status(422).json({
+        success: false,
+        errorCode: 'GATE_UNAVAILABLE',
+        message: 'Hiện không có cổng hoạt động để đồng bộ lượt ra vào',
+      });
+    }
     const synced = [];
     const failed = [];
 

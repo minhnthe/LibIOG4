@@ -10,6 +10,7 @@ const {
   forceCheckOutUser,
 } = require('../controllers/admin_report_controller');
 const { authenticate, requireAdmin, requireStaff } = require('../middleware/auth_middleware');
+const { listGates, createGate, updateGate } = require('../controllers/gate_controller');
 
 const router = express.Router();
 
@@ -24,6 +25,11 @@ router.put('/users/:id', updateUser);
 router.patch('/users/:id/status', updateUserStatus);
 router.delete('/users/:id', requireAdmin, deleteUser); // CHỈ ADMIN MỚI ĐƯỢC XÓA USER
 router.post('/users/:id/restore', requireAdmin, restoreUser); // CHỈ ADMIN MỚI ĐƯỢC KHÔI PHỤC USER
+
+// ── Quản lý cổng / trạm quét ──
+router.get('/gates', listGates);
+router.post('/gates', requireAdmin, createGate);
+router.patch('/gates/:id', requireAdmin, updateGate);
 
 // ── Theo dõi thời gian thực ──
 router.get('/realtime/present', getPresentList);

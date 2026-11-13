@@ -11,6 +11,7 @@ class UserAdminModel extends Equatable {
   final DateTime? cardExpiry;
   final String? avatarUrl;
   final bool isInsideLibrary;
+  final String? tempPassword;
 
   const UserAdminModel({
     required this.id,
@@ -23,6 +24,7 @@ class UserAdminModel extends Equatable {
     this.cardExpiry,
     this.avatarUrl,
     this.isInsideLibrary = false,
+    this.tempPassword,
   });
 
   bool get isActive => status.toLowerCase() == 'active';
@@ -48,6 +50,7 @@ class UserAdminModel extends Equatable {
       cardExpiry: expiry,
       avatarUrl: json['avatarUrl']?.toString(),
       isInsideLibrary: json['isInsideLibrary'] == true,
+      tempPassword: json['tempPassword']?.toString(),
     );
   }
 
@@ -63,6 +66,7 @@ class UserAdminModel extends Equatable {
       'cardExpiry': cardExpiry?.toIso8601String(),
       'avatarUrl': avatarUrl,
       'isInsideLibrary': isInsideLibrary,
+      'tempPassword': tempPassword,
     };
   }
 
@@ -77,6 +81,7 @@ class UserAdminModel extends Equatable {
     DateTime? cardExpiry,
     String? avatarUrl,
     bool? isInsideLibrary,
+    String? tempPassword,
   }) {
     return UserAdminModel(
       id: id ?? this.id,
@@ -89,6 +94,7 @@ class UserAdminModel extends Equatable {
       cardExpiry: cardExpiry ?? this.cardExpiry,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isInsideLibrary: isInsideLibrary ?? this.isInsideLibrary,
+      tempPassword: tempPassword ?? this.tempPassword,
     );
   }
 
@@ -104,5 +110,6 @@ class UserAdminModel extends Equatable {
     cardExpiry,
     avatarUrl,
     isInsideLibrary,
+    tempPassword,
   ];
 }

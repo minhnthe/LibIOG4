@@ -15,6 +15,7 @@ class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> 
         super(const UserManagementInitial()) {
     on<FetchUsersEvent>(_onFetchUsers);
     on<ToggleUserStatusEvent>(_onToggleUserStatus);
+    on<CreateUserEvent>(_onCreateUser);
   }
 
   List<UserAdminModel>? get _currentUsers {
@@ -26,6 +27,26 @@ class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> 
       return (state as UserManagementError).fallbackUsers;
     }
     return null;
+  }
+
+  Future<void> _onCreateUser(
+    CreateUserEvent event,
+    Emitter<UserManagementState> emit,
+  ) async {
+    final currentList = _currentUsers ?? [];
+    try {
+      final createdUser = await adminRepository.createUser(
+        studentId: event.studentId,
+        name: event.name,
+        email: event.email,
+        phone: event.phone,
+        role: event.role,
+      );
+      emit(UserManagementUserCreated(createdUser, [createdUser, ...currentList]));
+      emit(UserManagementLoaded([createdUser, ...currentList]));
+    } catch (e) {
+      emit(UserManagementError('Không thể tạo tài khoản: $e', fallbackUsers: currentList));
+    }
   }
 
   Future<void> _onFetchUsers(

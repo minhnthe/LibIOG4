@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/config/config_bloc.dart';
+import '../../bloc/gate_management/gate_management_bloc.dart';
 import '../../bloc/realtime/realtime_bloc.dart';
 import '../../bloc/report/report_bloc.dart';
 import '../../bloc/scanner/scanner_bloc.dart';
@@ -11,6 +12,7 @@ import 'tabs/qr_scanner_tab.dart';
 import 'tabs/report_analytics_tab.dart';
 import 'tabs/system_config_tab.dart';
 import 'tabs/user_management_tab.dart';
+import 'tabs/gate_management_tab.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -26,6 +28,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   late final ScannerBloc _scannerBloc;
   late final UserManagementBloc _userManagementBloc;
   late final ReportBloc _reportBloc;
+  late final GateManagementBloc _gateManagementBloc;
 
   @override
   void initState() {
@@ -35,6 +38,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _scannerBloc = ScannerBloc();
     _userManagementBloc = UserManagementBloc();
     _reportBloc = ReportBloc();
+    _gateManagementBloc = GateManagementBloc();
   }
 
   @override
@@ -44,6 +48,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _scannerBloc.close();
     _userManagementBloc.close();
     _reportBloc.close();
+    _gateManagementBloc.close();
     super.dispose();
   }
 
@@ -53,6 +58,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     UserManagementTab(),
     SystemConfigTab(),
     ReportAnalyticsTab(),
+    GateManagementTab(),
   ];
 
   void _confirmLogout(BuildContext context) {
@@ -88,6 +94,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         BlocProvider.value(value: _scannerBloc),
         BlocProvider.value(value: _userManagementBloc),
         BlocProvider.value(value: _reportBloc),
+        BlocProvider.value(value: _gateManagementBloc),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -169,6 +176,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.bar_chart_rounded),
               label: 'Thống kê',
+              tooltip: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.door_front_door_rounded),
+              label: 'Cổng',
               tooltip: '',
             ),
           ],
