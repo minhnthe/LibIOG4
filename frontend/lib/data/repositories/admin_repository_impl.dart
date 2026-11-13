@@ -5,6 +5,7 @@ import '../models/occupancy_stats_model.dart';
 import '../models/report_data_model.dart';
 import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
+import '../models/user_admin_page_model.dart';
 import '../models/gate_model.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
@@ -44,7 +45,7 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
-  Future<List<UserAdminModel>> getUsers({String? search, String? status}) {
+  Future<UserAdminPageModel> getUsers({String? search, String? status}) {
     return remoteDataSource.getUsers(search: search, status: status);
   }
 

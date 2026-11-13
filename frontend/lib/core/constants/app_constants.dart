@@ -52,6 +52,7 @@ class AppConstants {
   // Auth endpoints
   static String get authEndpoint => '$baseUrl/auth';
   static String get authLogin => '$baseUrl/auth/login';
+  static String get authChangePassword => '$baseUrl/auth/change-password';
   static String get authRegister => '$baseUrl/auth/register';
 
   // Config endpoints

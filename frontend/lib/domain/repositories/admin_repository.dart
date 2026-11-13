@@ -3,6 +3,7 @@ import '../../data/models/occupancy_stats_model.dart';
 import '../../data/models/report_data_model.dart';
 import '../../data/models/system_config_model.dart';
 import '../../data/models/user_admin_model.dart';
+import '../../data/models/user_admin_page_model.dart';
 import '../../data/models/gate_model.dart';
 
 abstract class AdminRepository {
@@ -21,7 +22,7 @@ abstract class AdminRepository {
   Future<CheckInResultModel> processScan(String qrPayload, {String? deviceId});
 
   // Feature 4: Quản lý thành viên & Khóa thẻ
-  Future<List<UserAdminModel>> getUsers({String? search, String? status});
+  Future<UserAdminPageModel> getUsers({String? search, String? status});
   Future<UserAdminModel> createUser({
     required String studentId,
     required String name,

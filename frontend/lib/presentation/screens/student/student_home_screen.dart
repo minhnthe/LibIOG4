@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/fcm_service.dart';
 import '../../bloc/auth/auth_bloc.dart';
+import '../../widgets/change_password_dialog.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -323,6 +324,18 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             centerTitle: true,
             elevation: 1,
             actions: [
+              IconButton(
+                tooltip: 'Đổi mật khẩu',
+                icon: const Icon(Icons.lock_reset_rounded),
+                onPressed: () async {
+                  final changed = await showChangePasswordDialog(context);
+                  if (changed == true && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Đổi mật khẩu thành công')),
+                    );
+                  }
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.logout_rounded),
                 onPressed: () => _confirmLogout(context),

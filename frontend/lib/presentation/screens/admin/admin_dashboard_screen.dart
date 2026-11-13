@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/config/config_bloc.dart';
 import '../../bloc/gate_management/gate_management_bloc.dart';
@@ -13,6 +14,7 @@ import 'tabs/report_analytics_tab.dart';
 import 'tabs/system_config_tab.dart';
 import 'tabs/user_management_tab.dart';
 import 'tabs/gate_management_tab.dart';
+import '../../widgets/change_password_dialog.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -66,7 +68,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         title: const Text('Xác nhận đăng xuất'),
-        content: const Text('Bạn có chắc chắn muốn đăng xuất khỏi trang quản trị?'),
+        content: const Text(
+          'Bạn có chắc chắn muốn đăng xuất khỏi trang quản trị?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(),
@@ -76,7 +80,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () {
               Navigator.of(dialogCtx).pop();
               context.read<AuthBloc>().add(const AuthLogoutRequested());
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/login', (route) => false);
             },
             child: const Text('Đăng xuất'),
           ),
@@ -118,7 +123,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   children: [
                     if (user != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         margin: const EdgeInsets.only(right: 4),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50,
@@ -135,6 +143,20 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         ),
                       ),
                     IconButton(
+                      tooltip: 'Đổi mật khẩu',
+                      icon: const Icon(Icons.lock_reset_rounded),
+                      onPressed: () async {
+                        final changed = await showChangePasswordDialog(context);
+                        if (changed == true && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Đổi mật khẩu thành công'),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    IconButton(
                       icon: const Icon(Icons.logout_rounded),
                       onPressed: () => _confirmLogout(context),
                     ),
@@ -144,10 +166,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ],
         ),
-        body: IndexedStack(
-          index: _currentIndex,
-          children: _tabs,
-        ),
+        body: IndexedStack(index: _currentIndex, children: _tabs),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           currentIndex: _currentIndex,

@@ -8,6 +8,7 @@ import 'package:assignment/data/models/report_data_model.dart';
 import 'package:assignment/data/models/system_config_model.dart';
 import 'package:assignment/data/models/user_admin_model.dart';
 import 'package:assignment/data/models/gate_model.dart';
+import 'package:assignment/data/models/user_admin_page_model.dart';
 import 'package:assignment/data/models/user_model.dart';
 import 'package:assignment/domain/repositories/admin_repository.dart';
 import 'package:assignment/presentation/bloc/auth/auth_bloc.dart';
@@ -52,10 +53,8 @@ class FakeAdminRepository implements AdminRepository {
   }
 
   @override
-  Future<List<UserAdminModel>> getUsers({
-    String? search,
-    String? status,
-  }) async => [];
+  Future<UserAdminPageModel> getUsers({String? search, String? status}) async =>
+      const UserAdminPageModel(users: [], total: 0);
 
   @override
   Future<UserAdminModel> createUser({
@@ -95,13 +94,25 @@ class FakeAdminRepository implements AdminRepository {
   Future<List<GateModel>> getGates() async => [];
 
   @override
-  Future<GateModel> createGate({required String gateName, String location = ''}) async {
+  Future<GateModel> createGate({
+    required String gateName,
+    String location = '',
+  }) async {
     return GateModel(id: 'gate_1', gateName: gateName, location: location);
   }
 
   @override
-  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status}) async {
-    return GateModel(id: gateId, gateName: gateName ?? 'Cổng', status: status ?? 'ACTIVE');
+  Future<GateModel> updateGate(
+    String gateId, {
+    String? gateName,
+    String? location,
+    String? status,
+  }) async {
+    return GateModel(
+      id: gateId,
+      gateName: gateName ?? 'Cổng',
+      status: status ?? 'ACTIVE',
+    );
   }
 
   @override

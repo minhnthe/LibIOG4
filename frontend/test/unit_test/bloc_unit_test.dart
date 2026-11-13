@@ -8,6 +8,7 @@ import 'package:assignment/data/models/report_data_model.dart';
 import 'package:assignment/data/models/system_config_model.dart';
 import 'package:assignment/data/models/user_admin_model.dart';
 import 'package:assignment/data/models/gate_model.dart';
+import 'package:assignment/data/models/user_admin_page_model.dart';
 
 import 'package:assignment/presentation/bloc/scanner/scanner_bloc.dart';
 import 'package:assignment/presentation/bloc/config/config_bloc.dart';
@@ -70,8 +71,8 @@ class FakeAdminRepository implements AdminRepository {
   }
 
   @override
-  Future<List<UserAdminModel>> getUsers({String? search, String? status}) async {
-    return [];
+  Future<UserAdminPageModel> getUsers({String? search, String? status}) async {
+    return const UserAdminPageModel(users: [], total: 0);
   }
 
   @override

@@ -1,7 +1,9 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+
 import '../../../bloc/auth/auth_bloc.dart';
 import '../../../bloc/user_management/user_management_bloc.dart';
 import '../../../../data/models/user_admin_model.dart';
@@ -35,8 +37,8 @@ class _UserManagementTabState extends State<UserManagementTab> {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       context.read<UserManagementBloc>().add(
-            FetchUsersEvent(query: query.trim(), status: _selectedStatusFilter),
-          );
+        FetchUsersEvent(query: query.trim(), status: _selectedStatusFilter),
+      );
     });
   }
 
@@ -45,18 +47,24 @@ class _UserManagementTabState extends State<UserManagementTab> {
       _selectedStatusFilter = status;
     });
     context.read<UserManagementBloc>().add(
-          FetchUsersEvent(
-            query: _searchController.text.trim(),
-            status: _selectedStatusFilter,
-          ),
-        );
+      FetchUsersEvent(
+        query: _searchController.text.trim(),
+        status: _selectedStatusFilter,
+      ),
+    );
   }
 
-  void _confirmToggleStatus(UserAdminModel user, {required bool canToggle, String? disableReason}) {
+  void _confirmToggleStatus(
+    UserAdminModel user, {
+    required bool canToggle,
+    String? disableReason,
+  }) {
     if (!canToggle) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(disableReason ?? 'Không thể thao tác trên tài khoản này'),
+          content: Text(
+            disableReason ?? 'Không thể thao tác trên tài khoản này',
+          ),
           backgroundColor: Colors.orange.shade800,
           behavior: SnackBarBehavior.floating,
         ),
@@ -92,19 +100,23 @@ class _UserManagementTabState extends State<UserManagementTab> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: willLock ? Colors.red.shade600 : Colors.green.shade600,
+              backgroundColor: willLock
+                  ? Colors.red.shade600
+                  : Colors.green.shade600,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {
               Navigator.of(dialogCtx).pop();
               context.read<UserManagementBloc>().add(
-                    ToggleUserStatusEvent(
-                      userId: user.id,
-                      currentStatus: user.status,
-                      studentName: user.name,
-                    ),
-                  );
+                ToggleUserStatusEvent(
+                  userId: user.id,
+                  currentStatus: user.status,
+                  studentName: user.name,
+                ),
+              );
             },
             child: Text(actionText.toUpperCase()),
           ),
@@ -177,17 +189,24 @@ class _UserManagementTabState extends State<UserManagementTab> {
         } else if (state is UserManagementError) {
           users = state.fallbackUsers ?? [];
         }
+        final totalUsers = state is UserManagementLoaded
+            ? state.total
+            : state is UserManagementStatusUpdated
+            ? state.total
+            : state is UserManagementUserCreated
+            ? state.total
+            : users.length;
 
         final isLoading = state is UserManagementLoading && users.isEmpty;
 
         return RefreshIndicator(
           onRefresh: () async {
             context.read<UserManagementBloc>().add(
-                  FetchUsersEvent(
-                    query: _searchController.text.trim(),
-                    status: _selectedStatusFilter,
-                  ),
-                );
+              FetchUsersEvent(
+                query: _searchController.text.trim(),
+                status: _selectedStatusFilter,
+              ),
+            );
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -211,7 +230,11 @@ class _UserManagementTabState extends State<UserManagementTab> {
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+                        border: Border.all(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -221,7 +244,11 @@ class _UserManagementTabState extends State<UserManagementTab> {
                               color: theme.colorScheme.primary,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.manage_accounts_rounded, color: Colors.white, size: 28),
+                            child: const Icon(
+                              Icons.manage_accounts_rounded,
+                              color: Colors.white,
+                              size: 28,
+                            ),
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -230,12 +257,16 @@ class _UserManagementTabState extends State<UserManagementTab> {
                               children: [
                                 Text(
                                   'Quản lý thành viên & thẻ thư viện',
-                                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'Tìm kiếm theo tên/MSSV và gạt công tắc để khóa/mở thẻ tức thì.',
-                                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: Colors.grey.shade600,
+                                  ),
                                 ),
                               ],
                             ),
@@ -261,8 +292,12 @@ class _UserManagementTabState extends State<UserManagementTab> {
                                 },
                               )
                             : null,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -270,7 +305,13 @@ class _UserManagementTabState extends State<UserManagementTab> {
                     // Filter Chips Row
                     Row(
                       children: [
-                        Text('Lọc trạng thái:', style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+                        Text(
+                          'Lọc trạng thái:',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
                         const SizedBox(width: 8),
                         ChoiceChip(
                           label: const Text('Tất cả'),
@@ -300,30 +341,36 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Danh sách thành viên (${users.length})',
-                          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                          'Danh sách thành viên ($totalUsers)',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (isCurrentAdmin || currentUser?.isLibrarian == true)
+                            if (isCurrentAdmin ||
+                                currentUser?.isLibrarian == true)
                               FilledButton.icon(
                                 onPressed: () => _showCreateUserDialog(
                                   context,
                                   isCurrentAdmin: isCurrentAdmin,
                                 ),
-                                icon: const Icon(Icons.person_add_alt_1, size: 18),
+                                icon: const Icon(
+                                  Icons.person_add_alt_1,
+                                  size: 18,
+                                ),
                                 label: const Text('Tạo tài khoản'),
                               ),
                             IconButton(
                               icon: const Icon(Icons.refresh_rounded),
                               onPressed: () {
                                 context.read<UserManagementBloc>().add(
-                                      FetchUsersEvent(
-                                        query: _searchController.text.trim(),
-                                        status: _selectedStatusFilter,
-                                      ),
-                                    );
+                                  FetchUsersEvent(
+                                    query: _searchController.text.trim(),
+                                    status: _selectedStatusFilter,
+                                  ),
+                                );
                               },
                             ),
                           ],
@@ -340,7 +387,10 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       )
                     // Empty State
                     else if (users.isEmpty)
-                      _buildEmptyState(theme, hasFilter: _searchController.text.isNotEmpty)
+                      _buildEmptyState(
+                        theme,
+                        hasFilter: _searchController.text.isNotEmpty,
+                      )
                     // Student Cards List
                     else
                       ListView.separated(
@@ -397,6 +447,7 @@ class _UserManagementTabState extends State<UserManagementTab> {
     BuildContext context, {
     required bool isCurrentAdmin,
   }) async {
+    final userManagementBloc = context.read<UserManagementBloc>();
     final formKey = GlobalKey<FormState>();
     final studentIdController = TextEditingController();
     final nameController = TextEditingController();
@@ -408,7 +459,7 @@ class _UserManagementTabState extends State<UserManagementTab> {
       await showDialog(
         context: context,
         builder: (dialogContext) => StatefulBuilder(
-          builder: (context, setDialogState) => AlertDialog(
+          builder: (dialogContext, setDialogState) => AlertDialog(
             title: const Text('Tạo tài khoản'),
             content: Form(
               key: formKey,
@@ -418,15 +469,19 @@ class _UserManagementTabState extends State<UserManagementTab> {
                   children: [
                     TextFormField(
                       controller: studentIdController,
-                      decoration: const InputDecoration(labelText: 'Mã sinh viên / mã nhân viên'),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      decoration: const InputDecoration(
+                        labelText: 'Mã sinh viên / mã nhân viên',
+                      ),
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Vui lòng nhập mã tài khoản'
                           : null,
                     ),
                     TextFormField(
                       controller: nameController,
                       decoration: const InputDecoration(labelText: 'Họ và tên'),
-                      validator: (value) => value == null || value.trim().isEmpty
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
                           ? 'Vui lòng nhập họ tên'
                           : null,
                     ),
@@ -435,7 +490,8 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(labelText: 'Email'),
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) return 'Vui lòng nhập email';
+                        if (value == null || value.trim().isEmpty)
+                          return 'Vui lòng nhập email';
                         if (!value.contains('@')) return 'Email không hợp lệ';
                         return null;
                       },
@@ -443,18 +499,27 @@ class _UserManagementTabState extends State<UserManagementTab> {
                     TextFormField(
                       controller: phoneController,
                       keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(labelText: 'Số điện thoại (không bắt buộc)'),
+                      decoration: const InputDecoration(
+                        labelText: 'Số điện thoại (không bắt buộc)',
+                      ),
                     ),
                     DropdownButtonFormField<String>(
                       value: selectedRole,
                       decoration: const InputDecoration(labelText: 'Vai trò'),
                       items: [
-                        const DropdownMenuItem(value: 'STUDENT', child: Text('Sinh viên')),
+                        const DropdownMenuItem(
+                          value: 'STUDENT',
+                          child: Text('Sinh viên'),
+                        ),
                         if (isCurrentAdmin)
-                          const DropdownMenuItem(value: 'LIBRARIAN', child: Text('Thủ thư')),
+                          const DropdownMenuItem(
+                            value: 'LIBRARIAN',
+                            child: Text('Thủ thư'),
+                          ),
                       ],
                       onChanged: (value) {
-                        if (value != null) setDialogState(() => selectedRole = value);
+                        if (value != null)
+                          setDialogState(() => selectedRole = value);
                       },
                     ),
                   ],
@@ -470,15 +535,15 @@ class _UserManagementTabState extends State<UserManagementTab> {
                 onPressed: () {
                   if (!formKey.currentState!.validate()) return;
                   Navigator.of(dialogContext).pop();
-                  context.read<UserManagementBloc>().add(
-                        CreateUserEvent(
-                          studentId: studentIdController.text,
-                          name: nameController.text,
-                          email: emailController.text,
-                          phone: phoneController.text,
-                          role: selectedRole,
-                        ),
-                      );
+                  userManagementBloc.add(
+                    CreateUserEvent(
+                      studentId: studentIdController.text,
+                      name: nameController.text,
+                      email: emailController.text,
+                      phone: phoneController.text,
+                      role: selectedRole,
+                    ),
+                  );
                 },
                 child: const Text('TẠO'),
               ),
@@ -508,7 +573,8 @@ class _UserManagementTabState extends State<UserManagementTab> {
         ? DateFormat('dd/MM/yyyy').format(user.cardExpiry!)
         : 'Vô thời hạn';
 
-    final isSelf = (currentUserId.isNotEmpty && user.id == currentUserId) ||
+    final isSelf =
+        (currentUserId.isNotEmpty && user.id == currentUserId) ||
         (currentStudentId.isNotEmpty && user.studentId == currentStudentId);
     final canToggle = !isSelf && (isCurrentAdmin || user.isStudent);
 
@@ -556,7 +622,9 @@ class _UserManagementTabState extends State<UserManagementTab> {
               child: Text(
                 user.name.isNotEmpty ? user.name[0].toUpperCase() : 'U',
                 style: TextStyle(
-                  color: user.isLocked ? Colors.red.shade700 : theme.colorScheme.primary,
+                  color: user.isLocked
+                      ? Colors.red.shade700
+                      : theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -584,7 +652,10 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       const SizedBox(width: 8),
                       // Role Chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: roleBg,
                           borderRadius: BorderRadius.circular(6),
@@ -601,18 +672,27 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       const SizedBox(width: 6),
                       // Status Chip
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: user.isActive ? Colors.green.shade50 : Colors.red.shade50,
+                          color: user.isActive
+                              ? Colors.green.shade50
+                              : Colors.red.shade50,
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: user.isActive ? Colors.green.shade200 : Colors.red.shade200,
+                            color: user.isActive
+                                ? Colors.green.shade200
+                                : Colors.red.shade200,
                           ),
                         ),
                         child: Text(
                           user.isActive ? 'HOẠT ĐỘNG' : 'BỊ KHÓA',
                           style: TextStyle(
-                            color: user.isActive ? Colors.green.shade800 : Colors.red.shade800,
+                            color: user.isActive
+                                ? Colors.green.shade800
+                                : Colors.red.shade800,
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -621,7 +701,10 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       if (user.isInsideLibrary) ...[
                         const SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.blue.shade50,
                             borderRadius: BorderRadius.circular(6),
@@ -651,7 +734,13 @@ class _UserManagementTabState extends State<UserManagementTab> {
                       ),
                       if (user.email.isNotEmpty) ...[
                         const SizedBox(width: 8),
-                        Text('• ${user.email}', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                        Text(
+                          '• ${user.email}',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ],
                   ),
@@ -675,10 +764,10 @@ class _UserManagementTabState extends State<UserManagementTab> {
                   inactiveTrackColor: Colors.red.shade100,
                   onChanged: canToggle
                       ? (_) => _confirmToggleStatus(
-                            user,
-                            canToggle: canToggle,
-                            disableReason: disableReason,
-                          )
+                          user,
+                          canToggle: canToggle,
+                          disableReason: disableReason,
+                        )
                       : null,
                 ),
                 Text(
@@ -689,7 +778,9 @@ class _UserManagementTabState extends State<UserManagementTab> {
                     fontSize: 11,
                     color: !canToggle
                         ? Colors.grey.shade500
-                        : (user.isActive ? Colors.grey.shade600 : Colors.red.shade700),
+                        : (user.isActive
+                              ? Colors.grey.shade600
+                              : Colors.red.shade700),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -708,13 +799,17 @@ class _UserManagementTabState extends State<UserManagementTab> {
       child: Column(
         children: [
           Icon(
-            hasFilter ? Icons.person_search_rounded : Icons.people_outline_rounded,
+            hasFilter
+                ? Icons.person_search_rounded
+                : Icons.people_outline_rounded,
             size: 56,
             color: Colors.grey.shade400,
           ),
           const SizedBox(height: 12),
           Text(
-            hasFilter ? 'Không tìm thấy thành viên nào phù hợp' : 'Chưa có thành viên nào trong danh sách',
+            hasFilter
+                ? 'Không tìm thấy thành viên nào phù hợp'
+                : 'Chưa có thành viên nào trong danh sách',
             style: theme.textTheme.titleMedium?.copyWith(
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w600,
@@ -722,8 +817,12 @@ class _UserManagementTabState extends State<UserManagementTab> {
           ),
           const SizedBox(height: 4),
           Text(
-            hasFilter ? 'Hãy thử kiểm tra lại từ khóa tìm kiếm hoặc bộ lọc' : 'Hệ thống chưa có người dùng nào được tạo',
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey.shade500),
+            hasFilter
+                ? 'Hãy thử kiểm tra lại từ khóa tìm kiếm hoặc bộ lọc'
+                : 'Hệ thống chưa có người dùng nào được tạo',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: Colors.grey.shade500,
+            ),
           ),
         ],
       ),

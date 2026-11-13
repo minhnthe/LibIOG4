@@ -31,6 +31,17 @@ class UserManagementBloc
     return null;
   }
 
+  int get _currentTotal {
+    if (state is UserManagementLoaded) {
+      return (state as UserManagementLoaded).total;
+    } else if (state is UserManagementStatusUpdated) {
+      return (state as UserManagementStatusUpdated).total;
+    } else if (state is UserManagementUserCreated) {
+      return (state as UserManagementUserCreated).total;
+    }
+    return _currentUsers?.length ?? 0;
+  }
+
   Future<void> _onCreateUser(
     CreateUserEvent event,
     Emitter<UserManagementState> emit,
@@ -44,10 +55,32 @@ class UserManagementBloc
         phone: event.phone,
         role: event.role,
       );
-      // Đọc lại từ server để danh sách trên màn hình phản ánh đúng dữ liệu MongoDB.
-      final users = await adminRepository.getUsers();
-      emit(UserManagementUserCreated(createdUser, users));
-      emit(UserManagementLoaded(users));
+      final optimisticUsers = [createdUser, ...currentList];
+      final optimisticTotal = _currentTotal + 1;
+
+      try {
+        // Đọc lại từ server để danh sách trên màn hình phản ánh đúng dữ liệu MongoDB.
+        final page = await adminRepository.getUsers();
+        emit(
+          UserManagementUserCreated(createdUser, page.users, total: page.total),
+        );
+        emit(UserManagementLoaded(page.users, total: page.total));
+      } catch (refreshError) {
+        // Không ẩn tài khoản vừa tạo nếu bước tải lại danh sách gặp lỗi.
+        emit(
+          UserManagementUserCreated(
+            createdUser,
+            optimisticUsers,
+            total: optimisticTotal,
+          ),
+        );
+        emit(
+          UserManagementError(
+            'Tạo tài khoản thành công nhưng không thể tải lại danh sách: $refreshError',
+            fallbackUsers: optimisticUsers,
+          ),
+        );
+      }
     } catch (e) {
       emit(
         UserManagementError(
@@ -67,13 +100,14 @@ class UserManagementBloc
     }
 
     try {
-      final users = await adminRepository.getUsers(
+      final page = await adminRepository.getUsers(
         search: event.query,
         status: event.status,
       );
       emit(
         UserManagementLoaded(
-          users,
+          page.users,
+          total: page.total,
           query: event.query ?? '',
           statusFilter: event.status,
         ),
@@ -104,8 +138,8 @@ class UserManagementBloc
           : 'Đã mở khóa thẻ';
       final msg = '$actionText của sinh viên ${event.studentName}';
 
-      emit(UserManagementStatusUpdated(msg, nextList));
-      emit(UserManagementLoaded(nextList));
+      emit(UserManagementStatusUpdated(msg, nextList, total: _currentTotal));
+      emit(UserManagementLoaded(nextList, total: _currentTotal));
     } catch (e) {
       emit(
         UserManagementError(

@@ -7,6 +7,7 @@ import '../models/occupancy_stats_model.dart';
 import '../models/report_data_model.dart';
 import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
+import '../models/user_admin_page_model.dart';
 import '../models/gate_model.dart';
 
 class AdminRemoteDataSource {
@@ -177,7 +178,7 @@ class AdminRemoteDataSource {
   }
 
   // ── Feature 4: Quản lý thành viên ──
-  Future<List<UserAdminModel>> getUsers({
+  Future<UserAdminPageModel> getUsers({
     String? search,
     String? status,
     int page = 1,
@@ -200,7 +201,11 @@ class AdminRemoteDataSource {
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       final list = body['data'] as List<dynamic>? ?? [];
-      return list.map((e) => UserAdminModel.fromJson(e as Map<String, dynamic>)).toList();
+      final pagination = body['pagination'] as Map<String, dynamic>? ?? {};
+      return UserAdminPageModel(
+        users: list.map((e) => UserAdminModel.fromJson(e as Map<String, dynamic>)).toList(),
+        total: int.tryParse(pagination['total']?.toString() ?? '') ?? list.length,
+      );
     }
     throw Exception('Không thể tải danh sách thành viên: ${response.statusCode}');
   }
