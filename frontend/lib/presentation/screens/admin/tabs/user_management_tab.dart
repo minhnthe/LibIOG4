@@ -172,6 +172,8 @@ class _UserManagementTabState extends State<UserManagementTab> {
           users = state.users;
         } else if (state is UserManagementStatusUpdated) {
           users = state.users;
+        } else if (state is UserManagementUserCreated) {
+          users = state.users;
         } else if (state is UserManagementError) {
           users = state.fallbackUsers ?? [];
         }
@@ -484,6 +486,8 @@ class _UserManagementTabState extends State<UserManagementTab> {
           ),
         ),
       );
+      // Đợi animation đóng dialog hoàn tất trước khi hủy controller của TextField.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
     } finally {
       studentIdController.dispose();
       nameController.dispose();

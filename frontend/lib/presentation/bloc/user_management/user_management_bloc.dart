@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+
 import '../../../../data/models/user_admin_model.dart';
 import '../../../../data/repositories/admin_repository_impl.dart';
 import '../../../../domain/repositories/admin_repository.dart';
@@ -7,12 +8,13 @@ import '../../../../domain/repositories/admin_repository.dart';
 part 'user_management_event.dart';
 part 'user_management_state.dart';
 
-class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> {
+class UserManagementBloc
+    extends Bloc<UserManagementEvent, UserManagementState> {
   final AdminRepository adminRepository;
 
   UserManagementBloc({AdminRepository? adminRepository})
-      : adminRepository = adminRepository ?? AdminRepositoryImpl(),
-        super(const UserManagementInitial()) {
+    : adminRepository = adminRepository ?? AdminRepositoryImpl(),
+      super(const UserManagementInitial()) {
     on<FetchUsersEvent>(_onFetchUsers);
     on<ToggleUserStatusEvent>(_onToggleUserStatus);
     on<CreateUserEvent>(_onCreateUser);
@@ -42,10 +44,17 @@ class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> 
         phone: event.phone,
         role: event.role,
       );
-      emit(UserManagementUserCreated(createdUser, [createdUser, ...currentList]));
-      emit(UserManagementLoaded([createdUser, ...currentList]));
+      // Đọc lại từ server để danh sách trên màn hình phản ánh đúng dữ liệu MongoDB.
+      final users = await adminRepository.getUsers();
+      emit(UserManagementUserCreated(createdUser, users));
+      emit(UserManagementLoaded(users));
     } catch (e) {
-      emit(UserManagementError('Không thể tạo tài khoản: $e', fallbackUsers: currentList));
+      emit(
+        UserManagementError(
+          'Không thể tạo tài khoản: $e',
+          fallbackUsers: currentList,
+        ),
+      );
     }
   }
 
@@ -62,11 +71,13 @@ class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> 
         search: event.query,
         status: event.status,
       );
-      emit(UserManagementLoaded(
-        users,
-        query: event.query ?? '',
-        statusFilter: event.status,
-      ));
+      emit(
+        UserManagementLoaded(
+          users,
+          query: event.query ?? '',
+          statusFilter: event.status,
+        ),
+      );
     } catch (e) {
       emit(UserManagementError(e.toString(), fallbackUsers: _currentUsers));
     }
@@ -88,16 +99,20 @@ class UserManagementBloc extends Bloc<UserManagementEvent, UserManagementState> 
         return u.id == event.userId ? updatedUser : u;
       }).toList();
 
-      final actionText = updatedUser.isLocked ? 'Đã khóa thẻ' : 'Đã mở khóa thẻ';
+      final actionText = updatedUser.isLocked
+          ? 'Đã khóa thẻ'
+          : 'Đã mở khóa thẻ';
       final msg = '$actionText của sinh viên ${event.studentName}';
 
       emit(UserManagementStatusUpdated(msg, nextList));
       emit(UserManagementLoaded(nextList));
     } catch (e) {
-      emit(UserManagementError(
-        'Không thể cập nhật trạng thái thẻ: $e',
-        fallbackUsers: currentList,
-      ));
+      emit(
+        UserManagementError(
+          'Không thể cập nhật trạng thái thẻ: $e',
+          fallbackUsers: currentList,
+        ),
+      );
     }
   }
 }

@@ -226,6 +226,7 @@ class _GateManagementTabState extends State<GateManagementTab> {
           ],
         ),
       );
+      await Future<void>.delayed(const Duration(milliseconds: 300));
     } finally {
       nameController.dispose();
       locationController.dispose();

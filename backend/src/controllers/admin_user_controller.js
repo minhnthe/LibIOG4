@@ -158,13 +158,20 @@ async function createUser(req, res, next) {
     // Tạo thẻ thư viện tương ứng trong bảng library_cards
     const expiryDate = cardExpiry ? new Date(cardExpiry) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
-    const card = await LibraryCard.create({
-      user_id: user._id,
-      qr_code_hash: crypto.randomBytes(16).toString('hex'),
-      issue_date: new Date(),
-      expiry_date: expiryDate,
-      status: 'ACTIVE',
-    });
+    let card;
+    try {
+      card = await LibraryCard.create({
+        user_id: user._id,
+        qr_code_hash: crypto.randomBytes(16).toString('hex'),
+        issue_date: new Date(),
+        expiry_date: expiryDate,
+        status: 'ACTIVE',
+      });
+    } catch (cardError) {
+      // Không để lại user mồ côi nếu việc tạo thẻ thất bại.
+      await User.deleteOne({ _id: user._id });
+      throw cardError;
+    }
 
     await user.populate('role_id');
     const safeData = user.toSafeObject();
