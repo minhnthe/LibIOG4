@@ -9,6 +9,7 @@ import 'package:assignment/data/models/system_config_model.dart';
 import 'package:assignment/data/models/user_admin_model.dart';
 import 'package:assignment/data/models/gate_model.dart';
 import 'package:assignment/data/models/user_admin_page_model.dart';
+import 'package:assignment/data/models/checkin_log_admin_model.dart';
 import 'package:assignment/data/models/user_model.dart';
 import 'package:assignment/domain/repositories/admin_repository.dart';
 import 'package:assignment/presentation/bloc/auth/auth_bloc.dart';
@@ -124,6 +125,14 @@ class FakeAdminRepository implements AdminRepository {
 
   @override
   Future<String> exportCsv({String? from, String? to}) async => '';
+
+  @override
+  Future<List<CheckinLogAdminModel>> getCheckinLogs({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    String? status,
+  }) async => [];
 }
 
 /// Fake AuthBloc dùng độc lập cho kiểm thử UI/Flow không phụ thuộc Network/SharedPreferences

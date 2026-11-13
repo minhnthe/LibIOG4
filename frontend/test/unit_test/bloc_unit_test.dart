@@ -9,6 +9,7 @@ import 'package:assignment/data/models/system_config_model.dart';
 import 'package:assignment/data/models/user_admin_model.dart';
 import 'package:assignment/data/models/gate_model.dart';
 import 'package:assignment/data/models/user_admin_page_model.dart';
+import 'package:assignment/data/models/checkin_log_admin_model.dart';
 
 import 'package:assignment/presentation/bloc/scanner/scanner_bloc.dart';
 import 'package:assignment/presentation/bloc/config/config_bloc.dart';
@@ -55,7 +56,10 @@ class FakeAdminRepository implements AdminRepository {
   }
 
   @override
-  Future<CheckInResultModel> processScan(String qrPayload, {String? deviceId}) async {
+  Future<CheckInResultModel> processScan(
+    String qrPayload, {
+    String? deviceId,
+  }) async {
     if (scanError != null) throw scanError!;
     return scanResult ??
         CheckInResultModel(
@@ -95,7 +99,10 @@ class FakeAdminRepository implements AdminRepository {
   }
 
   @override
-  Future<UserAdminModel> toggleUserStatus(String userId, String currentStatus) async {
+  Future<UserAdminModel> toggleUserStatus(
+    String userId,
+    String currentStatus,
+  ) async {
     return const UserAdminModel(
       id: 'u1',
       studentId: 'HE190001',
@@ -109,24 +116,48 @@ class FakeAdminRepository implements AdminRepository {
   Future<List<GateModel>> getGates() async => [];
 
   @override
-  Future<GateModel> createGate({required String gateName, String location = ''}) async {
+  Future<GateModel> createGate({
+    required String gateName,
+    String location = '',
+  }) async {
     return GateModel(id: 'gate_1', gateName: gateName, location: location);
   }
 
   @override
-  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status}) async {
-    return GateModel(id: gateId, gateName: gateName ?? 'Cổng', status: status ?? 'ACTIVE');
+  Future<GateModel> updateGate(
+    String gateId, {
+    String? gateName,
+    String? location,
+    String? status,
+  }) async {
+    return GateModel(
+      id: gateId,
+      gateName: gateName ?? 'Cổng',
+      status: status ?? 'ACTIVE',
+    );
   }
 
   @override
-  Future<ReportDataModel> getReport({String groupBy = 'hour'}) async {
+  Future<ReportDataModel> getReport({
+    String groupBy = 'hour',
+    String? from,
+    String? to,
+  }) async {
     return ReportDataModel.empty();
   }
 
   @override
-  Future<String> exportCsv() async {
+  Future<String> exportCsv({String? from, String? to}) async {
     return 'STT,MSSV,Name\n1,HE190001,Nguyen Van A';
   }
+
+  @override
+  Future<List<CheckinLogAdminModel>> getCheckinLogs({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    String? status,
+  }) async => [];
 }
 
 void main() {
@@ -174,7 +205,8 @@ void main() {
           );
           return ScannerBloc(adminRepository: fakeRepo);
         },
-        act: (bloc) => bloc.add(const ProcessQrCodeEvent('LIB:HE190001:CARD01:999999')),
+        act: (bloc) =>
+            bloc.add(const ProcessQrCodeEvent('LIB:HE190001:CARD01:999999')),
         expect: () => [
           isA<ScannerProcessing>(),
           isA<ScannerSuccess>().having(
@@ -188,10 +220,13 @@ void main() {
       blocTest<ScannerBloc, ScannerState>(
         'UT-BLOC-04: Emits [ScannerProcessing, ScannerFailed] when capacity is full',
         build: () {
-          fakeRepo.scanError = Exception('[CAPACITY_FULL] Thư viện đã đạt sức chứa tối đa');
+          fakeRepo.scanError = Exception(
+            '[CAPACITY_FULL] Thư viện đã đạt sức chứa tối đa',
+          );
           return ScannerBloc(adminRepository: fakeRepo);
         },
-        act: (bloc) => bloc.add(const ProcessQrCodeEvent('LIB:HE190002:CARD02:999999')),
+        act: (bloc) =>
+            bloc.add(const ProcessQrCodeEvent('LIB:HE190002:CARD02:999999')),
         expect: () => [
           isA<ScannerProcessing>(),
           isA<ScannerFailed>()
@@ -230,7 +265,11 @@ void main() {
         act: (bloc) => bloc.add(const LoadConfigEvent()),
         expect: () => [
           isA<ConfigLoading>(),
-          isA<ConfigLoaded>().having((s) => s.config.maxCapacity, 'maxCapacity', equals(150)),
+          isA<ConfigLoaded>().having(
+            (s) => s.config.maxCapacity,
+            'maxCapacity',
+            equals(150),
+          ),
         ],
       );
 
@@ -243,7 +282,11 @@ void main() {
         act: (bloc) => bloc.add(const LoadConfigEvent()),
         expect: () => [
           isA<ConfigLoading>(),
-          isA<ConfigError>().having((s) => s.message, 'message', contains('Network connection failed')),
+          isA<ConfigError>().having(
+            (s) => s.message,
+            'message',
+            contains('Network connection failed'),
+          ),
         ],
       );
 
@@ -258,12 +301,20 @@ void main() {
           return ConfigBloc(adminRepository: fakeRepo);
         },
         seed: () => const ConfigLoaded(
-          SystemConfigModel(maxCapacity: 100, openTime: '07:00', closeTime: '21:00'),
+          SystemConfigModel(
+            maxCapacity: 100,
+            openTime: '07:00',
+            closeTime: '21:00',
+          ),
         ),
         act: (bloc) => bloc.add(const UpdateConfigEvent({'maxCapacity': 10})),
         expect: () => [
           isA<ConfigUpdating>(),
-          isA<ConfigUpdateSuccess>().having((s) => s.config.maxCapacity, 'maxCapacity', equals(10)),
+          isA<ConfigUpdateSuccess>().having(
+            (s) => s.config.maxCapacity,
+            'maxCapacity',
+            equals(10),
+          ),
         ],
       );
     });
@@ -310,9 +361,14 @@ void main() {
           return RealtimeBloc(adminRepository: fakeRepo);
         },
         seed: () => RealtimeLoaded(
-          const OccupancyStatsModel(currentOccupancy: 6, maxCapacity: 50, occupancyPercent: 12),
+          const OccupancyStatsModel(
+            currentOccupancy: 6,
+            maxCapacity: 50,
+            occupancyPercent: 12,
+          ),
         ),
-        act: (bloc) => bloc.add(const ForceCheckOutUserEvent('user_123', 'Tran Thi B')),
+        act: (bloc) =>
+            bloc.add(const ForceCheckOutUserEvent('user_123', 'Tran Thi B')),
         expect: () => [
           isA<RealtimeActionSuccess>().having(
             (s) => s.message,

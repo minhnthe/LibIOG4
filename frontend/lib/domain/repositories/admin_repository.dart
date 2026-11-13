@@ -5,6 +5,7 @@ import '../../data/models/system_config_model.dart';
 import '../../data/models/user_admin_model.dart';
 import '../../data/models/user_admin_page_model.dart';
 import '../../data/models/gate_model.dart';
+import '../../data/models/checkin_log_admin_model.dart';
 
 abstract class AdminRepository {
   // Auth
@@ -33,11 +34,29 @@ abstract class AdminRepository {
   Future<UserAdminModel> toggleUserStatus(String userId, String currentStatus);
 
   // Feature 5: Biểu đồ thống kê & Xuất CSV
-  Future<ReportDataModel> getReport({String groupBy = 'hour', String? from, String? to});
+  Future<ReportDataModel> getReport({
+    String groupBy = 'hour',
+    String? from,
+    String? to,
+  });
   Future<String> exportCsv({String? from, String? to});
+  Future<List<CheckinLogAdminModel>> getCheckinLogs({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    String? status,
+  });
 
   // Feature 6: Quản lý cổng / trạm quét
   Future<List<GateModel>> getGates();
-  Future<GateModel> createGate({required String gateName, String location = ''});
-  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status});
+  Future<GateModel> createGate({
+    required String gateName,
+    String location = '',
+  });
+  Future<GateModel> updateGate(
+    String gateId, {
+    String? gateName,
+    String? location,
+    String? status,
+  });
 }

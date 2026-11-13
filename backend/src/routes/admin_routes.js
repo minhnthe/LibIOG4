@@ -6,7 +6,7 @@ const {
 } = require('../controllers/admin_user_controller');
 const {
   getPresentList, getRealtimeStats,
-  getCheckinReport, getUserHistory, exportReport,
+  getCheckinReport, getCheckinLogs, getUserHistory, exportReport,
   forceCheckOutUser,
 } = require('../controllers/admin_report_controller');
 const { authenticate, requireAdmin, requireStaff } = require('../middleware/auth_middleware');
@@ -38,6 +38,7 @@ router.post('/realtime/checkout/:userId', forceCheckOutUser);
 
 // ── Báo cáo & thống kê ──
 router.get('/reports/checkin', getCheckinReport);
+router.get('/reports/logs', getCheckinLogs);
 router.get('/reports/users/:id/history', getUserHistory);
 router.get('/reports/export', exportReport);
 

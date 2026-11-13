@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/auth/auth_bloc.dart';
 import '../../bloc/config/config_bloc.dart';
 import '../../bloc/gate_management/gate_management_bloc.dart';
+import '../../bloc/checkin_logs/checkin_logs_bloc.dart';
 import '../../bloc/realtime/realtime_bloc.dart';
 import '../../bloc/report/report_bloc.dart';
 import '../../bloc/scanner/scanner_bloc.dart';
@@ -14,6 +15,7 @@ import 'tabs/report_analytics_tab.dart';
 import 'tabs/system_config_tab.dart';
 import 'tabs/user_management_tab.dart';
 import 'tabs/gate_management_tab.dart';
+import 'tabs/checkin_logs_tab.dart';
 import '../../widgets/change_password_dialog.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -31,6 +33,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   late final UserManagementBloc _userManagementBloc;
   late final ReportBloc _reportBloc;
   late final GateManagementBloc _gateManagementBloc;
+  late final CheckinLogsBloc _checkinLogsBloc;
 
   @override
   void initState() {
@@ -41,6 +44,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _userManagementBloc = UserManagementBloc();
     _reportBloc = ReportBloc();
     _gateManagementBloc = GateManagementBloc();
+    _checkinLogsBloc = CheckinLogsBloc();
   }
 
   @override
@@ -51,6 +55,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     _userManagementBloc.close();
     _reportBloc.close();
     _gateManagementBloc.close();
+    _checkinLogsBloc.close();
     super.dispose();
   }
 
@@ -61,6 +66,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     SystemConfigTab(),
     ReportAnalyticsTab(),
     GateManagementTab(),
+    CheckinLogsTab(),
   ];
 
   void _confirmLogout(BuildContext context) {
@@ -100,6 +106,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         BlocProvider.value(value: _userManagementBloc),
         BlocProvider.value(value: _reportBloc),
         BlocProvider.value(value: _gateManagementBloc),
+        BlocProvider.value(value: _checkinLogsBloc),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -200,6 +207,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             BottomNavigationBarItem(
               icon: Icon(Icons.door_front_door_rounded),
               label: 'Cổng',
+              tooltip: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt_long_rounded),
+              label: 'Nhật ký',
               tooltip: '',
             ),
           ],

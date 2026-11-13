@@ -1,6 +1,8 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../core/constants/app_constants.dart';
 import '../models/checkin_result_model.dart';
 import '../models/occupancy_stats_model.dart';
@@ -9,12 +11,14 @@ import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
 import '../models/user_admin_page_model.dart';
 import '../models/gate_model.dart';
+import '../models/checkin_log_admin_model.dart';
 
 class AdminRemoteDataSource {
   final http.Client client;
   static String? _cachedToken;
 
-  AdminRemoteDataSource({http.Client? client}) : client = client ?? http.Client();
+  AdminRemoteDataSource({http.Client? client})
+    : client = client ?? http.Client();
 
   static void setAuthToken(String? token) {
     _cachedToken = token;
@@ -107,7 +111,9 @@ class AdminRemoteDataSource {
     );
 
     if (presentRes.statusCode != 200) {
-      throw Exception('Không thể tải danh sách đang có mặt: ${presentRes.statusCode}');
+      throw Exception(
+        'Không thể tải danh sách đang có mặt: ${presentRes.statusCode}',
+      );
     }
 
     final presentJson = jsonDecode(presentRes.body) as Map<String, dynamic>;
@@ -126,7 +132,8 @@ class AdminRemoteDataSource {
       if (statsRes.statusCode == 200) {
         final statsJson = jsonDecode(statsRes.body) as Map<String, dynamic>;
         final statsData = statsJson['data'] as Map<String, dynamic>? ?? {};
-        totalToday = int.tryParse(statsData['totalVisitsToday']?.toString() ?? '0') ?? 0;
+        totalToday =
+            int.tryParse(statsData['totalVisitsToday']?.toString() ?? '0') ?? 0;
         peak = int.tryParse(statsData['peakOccupancy']?.toString() ?? '0') ?? 0;
         peakTime = statsData['peakTime']?.toString();
       }
@@ -156,7 +163,10 @@ class AdminRemoteDataSource {
   }
 
   // ── Feature 3: Trạm quét QR & Nhập tay ──
-  Future<CheckInResultModel> submitScan(String qrPayload, {String? deviceId}) async {
+  Future<CheckInResultModel> submitScan(
+    String qrPayload, {
+    String? deviceId,
+  }) async {
     final response = await client.post(
       Uri.parse(AppConstants.checkinEndpoint),
       headers: await _headers(requiresAuth: true),
@@ -195,19 +205,28 @@ class AdminRemoteDataSource {
       queryParams['status'] = status;
     }
 
-    final uri = Uri.parse(AppConstants.adminUsersEndpoint).replace(queryParameters: queryParams);
-    final response = await client.get(uri, headers: await _headers(requiresAuth: true));
+    final uri = Uri.parse(AppConstants.adminUsersEndpoint)
+        .replace(queryParameters: queryParams);
+    final response = await client.get(
+      uri,
+      headers: await _headers(requiresAuth: true),
+    );
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       final list = body['data'] as List<dynamic>? ?? [];
       final pagination = body['pagination'] as Map<String, dynamic>? ?? {};
       return UserAdminPageModel(
-        users: list.map((e) => UserAdminModel.fromJson(e as Map<String, dynamic>)).toList(),
-        total: int.tryParse(pagination['total']?.toString() ?? '') ?? list.length,
+        users: list
+            .map((e) => UserAdminModel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        total:
+            int.tryParse(pagination['total']?.toString() ?? '') ?? list.length,
       );
     }
-    throw Exception('Không thể tải danh sách thành viên: ${response.statusCode}');
+    throw Exception(
+      'Không thể tải danh sách thành viên: ${response.statusCode}',
+    );
   }
 
   Future<UserAdminModel> updateUserStatus(String userId, String status) async {
@@ -261,16 +280,24 @@ class AdminRemoteDataSource {
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 200 && body['success'] == true) {
       final list = body['data'] as List<dynamic>? ?? [];
-      return list.map((item) => GateModel.fromJson(item as Map<String, dynamic>)).toList();
+      return list
+          .map((item) => GateModel.fromJson(item as Map<String, dynamic>))
+          .toList();
     }
     throw Exception(body['message'] ?? 'Không thể tải danh sách cổng');
   }
 
-  Future<GateModel> createGate({required String gateName, String location = ''}) async {
+  Future<GateModel> createGate({
+    required String gateName,
+    String location = '',
+  }) async {
     final response = await client.post(
       Uri.parse(AppConstants.adminGatesEndpoint),
       headers: await _headers(requiresAuth: true),
-      body: jsonEncode({'gateName': gateName.trim(), 'location': location.trim()}),
+      body: jsonEncode({
+        'gateName': gateName.trim(),
+        'location': location.trim(),
+      }),
     );
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     if (response.statusCode == 201 && body['success'] == true) {
@@ -311,8 +338,12 @@ class AdminRemoteDataSource {
     if (from != null) queryParams['from'] = from;
     if (to != null) queryParams['to'] = to;
 
-    final uri = Uri.parse(AppConstants.adminReportsCheckin).replace(queryParameters: queryParams);
-    final response = await client.get(uri, headers: await _headers(requiresAuth: true));
+    final uri = Uri.parse(AppConstants.adminReportsCheckin)
+        .replace(queryParameters: queryParams);
+    final response = await client.get(
+      uri,
+      headers: await _headers(requiresAuth: true),
+    );
 
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -327,18 +358,52 @@ class AdminRemoteDataSource {
     if (from != null) queryParams['from'] = from;
     if (to != null) queryParams['to'] = to;
 
-    final uri = Uri.parse(AppConstants.adminReportsExport).replace(queryParameters: queryParams);
+    final uri = Uri.parse(AppConstants.adminReportsExport)
+        .replace(queryParameters: queryParams);
     final response = await client.get(
       uri,
-      headers: {
-        'Accept': 'text/csv',
-        ...await _headers(requiresAuth: true),
-      },
+      headers: {'Accept': 'text/csv', ...await _headers(requiresAuth: true)},
     );
 
     if (response.statusCode == 200) {
       return response.body;
     }
     throw Exception('Không thể xuất báo cáo CSV: ${response.statusCode}');
+  }
+
+  Future<List<CheckinLogAdminModel>> getCheckinLogs({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    String? status,
+  }) async {
+    final queryParams = <String, String>{
+      'page': page.toString(),
+      'limit': limit.toString(),
+    };
+    if (search != null && search.trim().isNotEmpty) {
+      queryParams['search'] = search.trim();
+    }
+    if (status != null && status.isNotEmpty) {
+      queryParams['status'] = status;
+    }
+
+    final uri = Uri.parse(AppConstants.adminReportsLogs)
+        .replace(queryParameters: queryParams);
+    final response = await client.get(
+      uri,
+      headers: await _headers(requiresAuth: true),
+    );
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    if (response.statusCode == 200 && body['success'] == true) {
+      final list = body['data'] as List<dynamic>? ?? [];
+      return list
+          .map(
+            (item) =>
+                CheckinLogAdminModel.fromJson(item as Map<String, dynamic>),
+          )
+          .toList();
+    }
+    throw Exception(body['message'] ?? 'Không thể tải nhật ký ra vào');
   }
 }

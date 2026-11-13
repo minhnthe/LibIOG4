@@ -428,6 +428,80 @@ async function getUserHistory(req, res, next) {
   }
 }
 
+// GET /api/admin/reports/logs — Danh sách log check-in/check-out phân trang
+async function getCheckinLogs(req, res, next) {
+  try {
+    const {
+      page = 1,
+      limit = 50,
+      from,
+      to,
+      search,
+      status,
+    } = req.query;
+    const pageNumber = Math.max(1, Number(page) || 1);
+    const limitNumber = Math.min(100, Math.max(1, Number(limit) || 50));
+    const filter = {};
+
+    if (from || to) {
+      filter.check_in_time = {};
+      if (from) filter.check_in_time.$gte = new Date(from);
+      if (to) filter.check_in_time.$lte = new Date(to);
+    }
+    if (status && ['INSIDE', 'COMPLETED'].includes(String(status).toUpperCase())) {
+      filter.status = String(status).toUpperCase();
+    }
+
+    let userIds;
+    if (search && String(search).trim()) {
+      const users = await User.find({
+        deleted_at: null,
+        $or: [
+          { student_id: { $regex: String(search).trim(), $options: 'i' } },
+          { full_name: { $regex: String(search).trim(), $options: 'i' } },
+        ],
+      }).select('_id');
+      userIds = users.map((user) => user._id);
+      filter.user_id = { $in: userIds };
+    }
+
+    const total = await CheckInLog.countDocuments(filter);
+    const logs = await CheckInLog.find(filter)
+      .populate('user_id', 'student_id full_name')
+      .populate('gate_id', 'gate_name')
+      .sort({ check_in_time: -1 })
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    const data = logs.map((log) => ({
+      id: log._id,
+      logId: log._id,
+      userId: log.user_id?._id || log.user_id,
+      studentId: log.user_id?.student_id || '',
+      studentName: log.user_id?.full_name || '',
+      checkInTime: log.check_in_time,
+      checkOutTime: log.check_out_time,
+      durationMinutes: log.total_minutes,
+      actionType: log.action_type,
+      status: log.status,
+      gateName: log.gate_id?.gate_name || 'Cổng chính',
+    }));
+
+    res.json({
+      success: true,
+      data,
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 // GET /api/admin/reports/export?format=csv&from=...&to=...
 async function exportReport(req, res, next) {
   try {
@@ -522,6 +596,7 @@ module.exports = {
   getPresentList,
   getRealtimeStats,
   getCheckinReport,
+  getCheckinLogs,
   getUserHistory,
   exportReport,
   forceCheckOutUser,

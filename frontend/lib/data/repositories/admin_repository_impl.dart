@@ -7,12 +7,13 @@ import '../models/system_config_model.dart';
 import '../models/user_admin_model.dart';
 import '../models/user_admin_page_model.dart';
 import '../models/gate_model.dart';
+import '../models/checkin_log_admin_model.dart';
 
 class AdminRepositoryImpl implements AdminRepository {
   final AdminRemoteDataSource remoteDataSource;
 
   AdminRepositoryImpl({AdminRemoteDataSource? remoteDataSource})
-      : remoteDataSource = remoteDataSource ?? AdminRemoteDataSource();
+    : remoteDataSource = remoteDataSource ?? AdminRemoteDataSource();
 
   @override
   Future<Map<String, dynamic>> login(String studentId, String password) {
@@ -68,14 +69,24 @@ class AdminRepositoryImpl implements AdminRepository {
 
   @override
   Future<UserAdminModel> toggleUserStatus(String userId, String currentStatus) {
-    final isLocked = currentStatus.toLowerCase() == 'locked' || currentStatus.toUpperCase() == 'BLOCKED';
+    final isLocked =
+        currentStatus.toLowerCase() == 'locked' ||
+        currentStatus.toUpperCase() == 'BLOCKED';
     final nextStatus = isLocked ? 'active' : 'locked';
     return remoteDataSource.updateUserStatus(userId, nextStatus);
   }
 
   @override
-  Future<ReportDataModel> getReport({String groupBy = 'hour', String? from, String? to}) {
-    return remoteDataSource.getCheckinReport(groupBy: groupBy, from: from, to: to);
+  Future<ReportDataModel> getReport({
+    String groupBy = 'hour',
+    String? from,
+    String? to,
+  }) {
+    return remoteDataSource.getCheckinReport(
+      groupBy: groupBy,
+      from: from,
+      to: to,
+    );
   }
 
   @override
@@ -84,15 +95,38 @@ class AdminRepositoryImpl implements AdminRepository {
   }
 
   @override
+  Future<List<CheckinLogAdminModel>> getCheckinLogs({
+    int page = 1,
+    int limit = 50,
+    String? search,
+    String? status,
+  }) {
+    return remoteDataSource.getCheckinLogs(
+      page: page,
+      limit: limit,
+      search: search,
+      status: status,
+    );
+  }
+
+  @override
   Future<List<GateModel>> getGates() => remoteDataSource.getGates();
 
   @override
-  Future<GateModel> createGate({required String gateName, String location = ''}) {
+  Future<GateModel> createGate({
+    required String gateName,
+    String location = '',
+  }) {
     return remoteDataSource.createGate(gateName: gateName, location: location);
   }
 
   @override
-  Future<GateModel> updateGate(String gateId, {String? gateName, String? location, String? status}) {
+  Future<GateModel> updateGate(
+    String gateId, {
+    String? gateName,
+    String? location,
+    String? status,
+  }) {
     return remoteDataSource.updateGate(
       gateId,
       gateName: gateName,

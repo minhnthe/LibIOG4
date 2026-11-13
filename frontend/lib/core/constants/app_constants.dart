@@ -78,6 +78,7 @@ class AppConstants {
   static String get adminRealtimePresent => '$baseUrl/admin/realtime/present';
   static String get adminRealtimeStats => '$baseUrl/admin/realtime/stats';
   static String get adminReportsCheckin => '$baseUrl/admin/reports/checkin';
+  static String get adminReportsLogs => '$baseUrl/admin/reports/logs';
   static String get adminReportsExport => '$baseUrl/admin/reports/export';
   static String adminForceCheckout(String userId) =>
       '$baseUrl/admin/realtime/checkout/$userId';
