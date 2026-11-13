@@ -1,6 +1,10 @@
 const User = require('../models/user_model');
+const CheckInLog = require('../models/check_in_log_model');
 const SystemConfig = require('../models/system_config_model');
-const { sendClosingSoonNotification } = require('./fcm_service');
+const {
+  sendClosingSoonNotification,
+  sendAutoCheckOutNotification,
+} = require('./fcm_service');
 const {
   autoPromoteOperatingHours,
   getVNDateString,
@@ -10,6 +14,53 @@ const {
 
 let lastNotificationKey = null;
 let isChecking = false;
+
+function getVNClosingDate(date, closeTime) {
+  const dateStr = getVNDateString(date);
+  return new Date(`${dateStr}T${closeTime}:00+07:00`);
+}
+
+async function autoCheckOutAtClosing(closeTime, now) {
+  const closingTime = getVNClosingDate(now, closeTime);
+  const users = await User.find({
+    is_inside: true,
+    deleted_at: null,
+  });
+
+  let checkedOut = 0;
+  for (const user of users) {
+    const activeLog = await CheckInLog.findOne({
+      user_id: user._id,
+      status: 'INSIDE',
+      check_out_time: null,
+    }).sort({ check_in_time: -1 });
+
+    const checkOutTime = activeLog && closingTime > activeLog.check_in_time
+      ? closingTime
+      : now;
+
+    if (activeLog) {
+      activeLog.check_out_time = checkOutTime;
+      activeLog.status = 'COMPLETED';
+      activeLog.action_type = 'CHECK_OUT';
+      await activeLog.save();
+    }
+
+    user.is_inside = false;
+    await user.save();
+    checkedOut++;
+
+    try {
+      await sendAutoCheckOutNotification(user, activeLog);
+    } catch (error) {
+      console.warn(`[FCM] Không thể gửi thông báo tự động check-out cho ${user.student_id}: ${error.message}`);
+    }
+  }
+
+  if (checkedOut > 0) {
+    console.log(`[ClosingNotification] Đã tự động check-out ${checkedOut} sinh viên lúc ${closeTime}.`);
+  }
+}
 
 async function checkAndSendClosingNotifications() {
   if (isChecking) return;
@@ -37,16 +88,24 @@ async function checkAndSendClosingNotifications() {
       config.WARNING_MINUTES_BEFORE_CLOSE || config.warningMinutesBeforeClose || '15',
       10
     );
-    if (!Number.isFinite(warningMinutes) || warningMinutes <= 0) return;
+    const effectiveWarningMinutes = Number.isFinite(warningMinutes) && warningMinutes > 0
+      ? warningMinutes
+      : 0;
 
     const [closeHour, closeMinute] = closeTime.split(':').map(Number);
     const currentTotalMinutes = hour * 60 + minute;
     const closeTotalMinutes = closeHour * 60 + closeMinute;
-    const warningStart = closeTotalMinutes - warningMinutes;
 
-    if (currentTotalMinutes < warningStart || currentTotalMinutes >= closeTotalMinutes) return;
+    if (currentTotalMinutes >= closeTotalMinutes) {
+      await autoCheckOutAtClosing(closeTime, new Date());
+      return;
+    }
 
-    const notificationKey = `${today}:${closeTime}:${warningMinutes}`;
+    if (effectiveWarningMinutes <= 0) return;
+    const warningStart = closeTotalMinutes - effectiveWarningMinutes;
+    if (currentTotalMinutes < warningStart) return;
+
+    const notificationKey = `${today}:${closeTime}:${effectiveWarningMinutes}`;
     if (lastNotificationKey === notificationKey) return;
 
     const users = await User.find({
@@ -61,7 +120,7 @@ async function checkAndSendClosingNotifications() {
     let sent = 0;
     for (const user of users) {
       try {
-        const result = await sendClosingSoonNotification(user, closeTime, warningMinutes);
+        const result = await sendClosingSoonNotification(user, closeTime, effectiveWarningMinutes);
         if (result?.success) sent++;
       } catch (error) {
         console.warn(`[ClosingNotification] Không thể gửi cho ${user.student_id}: ${error.message}`);

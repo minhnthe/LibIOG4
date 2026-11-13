@@ -203,6 +203,23 @@ async function sendClosingSoonNotification(user, closeTime, warningMinutes) {
   });
 }
 
+async function sendAutoCheckOutNotification(user, log) {
+  if (!user || !user.device_token || !user.device_token.trim()) return;
+
+  const duration = log && log.total_minutes ? log.total_minutes : 0;
+  return sendPushNotification(user.device_token, {
+    title: 'Thông báo: Hệ thống đã tự động check-out',
+    body: `Thư viện đã đóng cửa. Bạn đã được tự động check-out sau ${duration} phút.`,
+    data: {
+      type: 'AUTO_CHECK_OUT',
+      studentId: user.student_id,
+      timestamp: (log?.check_out_time || new Date()).toISOString(),
+      logId: log?._id ? log._id.toString() : '',
+      durationMinutes: String(duration),
+    },
+  });
+}
+
 module.exports = {
   isFirebaseConfigured,
   sendPushNotification,
@@ -210,4 +227,5 @@ module.exports = {
   sendCardStatusNotification,
   sendForceCheckOutNotification,
   sendClosingSoonNotification,
+  sendAutoCheckOutNotification,
 };
