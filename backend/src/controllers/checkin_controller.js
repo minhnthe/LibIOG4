@@ -8,6 +8,7 @@ const { sendCheckInNotification } = require('../services/fcm_service');
 const {
   autoPromoteOperatingHours,
   resolveOperatingHoursForDate,
+  getVNDateString,
 } = require('../utils/operating_hours_helper');
 
 /** Lấy config dạng object { key: value } hỗ trợ cả UPPER_SNAKE và camelCase */

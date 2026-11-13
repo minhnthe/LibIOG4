@@ -3,6 +3,7 @@ const app = require('./src/app');
 const connectDB = require('./src/config/db');
 const SystemConfig = require('./src/models/system_config_model');
 const { bootstrapDemoAccounts } = require('./src/utils/bootstrap_accounts');
+const { startClosingNotificationScheduler } = require('./src/services/closing_notification_service');
 
 const PORT = process.env.PORT || 5000;
 
@@ -18,6 +19,7 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`ENV: ${process.env.NODE_ENV || 'development'}`);
+    startClosingNotificationScheduler();
   });
 }
 

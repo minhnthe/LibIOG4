@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/fcm_service.dart';
 import '../../bloc/auth/auth_bloc.dart';
@@ -25,6 +27,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   bool _isLoading = false;
   String? _errorMessage;
   Timer? _timer;
+  Timer? _statusTimer;
   bool? _isInside;
   StreamSubscription<RemoteMessage>? _fcmSubscription;
 
@@ -35,22 +38,31 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       final authState = context.read<AuthBloc>().state;
       final token = authState is Authenticated ? authState.token : null;
       _fetchQr(token: token);
+      _startStatusPolling();
 
       // Đảm bảo FCM device token luôn được đồng bộ lên MongoDB cho sinh viên
       if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
-        FirebaseMessaging.instance.getToken().then((fcmToken) {
-          if (fcmToken != null && fcmToken.isNotEmpty) {
-            FcmService.registerDeviceToken(deviceToken: fcmToken, authToken: token);
-          }
-        }).catchError((e) {
-          debugPrint('[FCM] Lỗi lấy token trong StudentHomeScreen: $e');
-        });
+        FirebaseMessaging.instance
+            .getToken()
+            .then((fcmToken) {
+              if (fcmToken != null && fcmToken.isNotEmpty) {
+                FcmService.registerDeviceToken(
+                  deviceToken: fcmToken,
+                  authToken: token,
+                );
+              }
+            })
+            .catchError((e) {
+              debugPrint('[FCM] Lỗi lấy token trong StudentHomeScreen: $e');
+            });
       }
     });
 
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       try {
-        _fcmSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _fcmSubscription = FirebaseMessaging.onMessage.listen((
+          RemoteMessage message,
+        ) {
           final type = message.data['type'];
           if (type == 'CHECK_IN_SUCCESS') {
             if (mounted) setState(() => _isInside = true);
@@ -59,9 +71,18 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               setState(() => _isInside = false);
               if (type == 'FORCE_CHECK_OUT') {
                 _showForceCheckOutDialog(
-                  message.notification?.body ?? 'Thủ thư đã thực hiện mời bạn rời khỏi thư viện.',
+                  message.notification?.body ??
+                      'Thủ thư đã thực hiện mời bạn rời khỏi thư viện.',
                 );
               }
+            }
+          } else if (type == 'LIBRARY_CLOSING_ALERT') {
+            if (mounted) {
+              _showClosingSoonDialog(
+                message:
+                    message.notification?.body ??
+                    'Thư viện sắp đóng cửa. Vui lòng chuẩn bị rời thư viện.',
+              );
             }
           }
         });
@@ -78,7 +99,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 28),
+            Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.red.shade700,
+              size: 28,
+            ),
             const SizedBox(width: 8),
             const Expanded(
               child: Text(
@@ -97,10 +122,29 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade700,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () => Navigator.of(ctx).pop(),
             child: const Text('ĐÃ HIỂU'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClosingSoonDialog({required String message}) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Thư viện sắp đóng cửa'),
+        content: Text(message),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Đã hiểu'),
           ),
         ],
       ),
@@ -111,6 +155,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   void dispose() {
     _fcmSubscription?.cancel();
     _timer?.cancel();
+    _statusTimer?.cancel();
     super.dispose();
   }
 
@@ -133,7 +178,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          if (authToken != null && authToken.isNotEmpty) 'Authorization': 'Bearer $authToken',
+          if (authToken != null && authToken.isNotEmpty)
+            'Authorization': 'Bearer $authToken',
         },
       );
 
@@ -157,31 +203,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         });
         _startTimer();
 
-        // Đồng bộ thêm với /api/checkin/current-status nếu backend chưa có trường isInside
-        if (parsedInside == null && authToken != null && authToken.isNotEmpty) {
-          try {
-            final statusRes = await http.get(
-              Uri.parse(AppConstants.checkinStatusEndpoint),
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': 'Bearer $authToken',
-              },
-            );
-            if (statusRes.statusCode == 200) {
-              final statusBody = jsonDecode(statusRes.body) as Map<String, dynamic>;
-              if (statusBody['success'] == true && statusBody['data'] != null) {
-                final statusData = statusBody['data'] as Map<String, dynamic>;
-                final inside = statusData['isInside'] == true || statusData['isInsideLibrary'] == true;
-                if (mounted) {
-                  setState(() {
-                    _isInside = inside;
-                  });
-                }
-              }
-            }
-          } catch (_) {}
-        }
+        await _fetchCurrentStatus(authToken);
       } else {
         if (!mounted) return;
         setState(() {
@@ -195,6 +217,49 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
         _errorMessage = 'Lỗi kết nối máy chủ: $e';
         _isLoading = false;
       });
+    }
+  }
+
+  void _startStatusPolling() {
+    _statusTimer?.cancel();
+    _statusTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _fetchCurrentStatus();
+    });
+  }
+
+  Future<void> _fetchCurrentStatus([String? token]) async {
+    if (!mounted) return;
+
+    try {
+      var authToken = token;
+      if (authToken == null || authToken.isEmpty) {
+        final prefs = await SharedPreferences.getInstance();
+        authToken = prefs.getString('auth_token');
+      }
+      if (authToken == null || authToken.isEmpty) return;
+
+      final statusRes = await http.get(
+        Uri.parse(AppConstants.checkinStatusEndpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+      );
+      if (statusRes.statusCode != 200) return;
+
+      final statusBody = jsonDecode(statusRes.body) as Map<String, dynamic>;
+      if (statusBody['success'] != true || statusBody['data'] == null) return;
+
+      final statusData = statusBody['data'] as Map<String, dynamic>;
+      final inside =
+          statusData['isInside'] == true ||
+          statusData['isInsideLibrary'] == true;
+      if (mounted && _isInside != inside) {
+        setState(() => _isInside = inside);
+      }
+    } catch (e) {
+      debugPrint('[Check-in status] Không thể đồng bộ trạng thái: $e');
     }
   }
 
@@ -231,7 +296,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             onPressed: () {
               Navigator.of(dialogCtx).pop();
               context.read<AuthBloc>().add(const AuthLogoutRequested());
-              Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/login', (route) => false);
             },
             child: const Text('Đăng xuất'),
           ),
@@ -334,8 +400,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                               : 'Đang ở bên ngoài (Quẹt để vào)',
                                           style: TextStyle(
                                             color: isInside
-                                              ? Colors.green.shade800
-                                              : Colors.grey.shade800,
+                                                ? Colors.green.shade800
+                                                : Colors.grey.shade800,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
@@ -363,14 +429,15 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.badge_outlined,
-                                      color: colorScheme.primary),
+                                  Icon(
+                                    Icons.badge_outlined,
+                                    color: colorScheme.primary,
+                                  ),
                                   const SizedBox(width: 8),
                                   Text(
                                     'Thẻ Thư Viện Điện Tử',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),
@@ -380,11 +447,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                               _buildInfoRow('Email:', user?.email ?? '---'),
                               const SizedBox(height: 8),
                               _buildInfoRow(
-                                  'Trạng thái thẻ:',
-                                  user?.status == 'ACTIVE'
-                                      ? 'Hoạt động'
-                                      : 'Bị khóa',
-                                  isPositive: user?.status == 'ACTIVE'),
+                                'Trạng thái thẻ:',
+                                user?.status == 'ACTIVE'
+                                    ? 'Hoạt động'
+                                    : 'Bị khóa',
+                                isPositive: user?.status == 'ACTIVE',
+                              ),
                               const SizedBox(height: 20),
                               Center(
                                 child: Container(
@@ -392,7 +460,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.grey.shade300),
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
                                   ),
                                   child: Column(
                                     children: [
@@ -420,27 +490,38 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                             color: Colors.grey.shade600,
                                           ),
                                         ),
-                                      ] else if (_isLoading && _qrPayload == null) ...[
+                                      ] else if (_isLoading &&
+                                          _qrPayload == null) ...[
                                         const SizedBox(
                                           height: 160,
-                                          child: Center(child: CircularProgressIndicator()),
+                                          child: Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
                                         ),
                                         const SizedBox(height: 8),
                                         const Text('Đang tạo mã QR động...'),
                                       ] else if (_errorMessage != null) ...[
-                                        Icon(Icons.error_outline_rounded,
-                                            size: 48, color: Colors.orange.shade700),
+                                        Icon(
+                                          Icons.error_outline_rounded,
+                                          size: 48,
+                                          color: Colors.orange.shade700,
+                                        ),
                                         const SizedBox(height: 8),
                                         Text(
                                           _errorMessage!,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
-                                              color: Colors.red.shade700, fontSize: 13),
+                                            color: Colors.red.shade700,
+                                            fontSize: 13,
+                                          ),
                                         ),
                                         const SizedBox(height: 10),
                                         OutlinedButton.icon(
                                           onPressed: () => _fetchQr(),
-                                          icon: const Icon(Icons.refresh_rounded, size: 18),
+                                          icon: const Icon(
+                                            Icons.refresh_rounded,
+                                            size: 18,
+                                          ),
                                           label: const Text('Thử lại'),
                                         ),
                                       ] else if (_qrPayload != null) ...[
@@ -463,8 +544,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                         Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.timer_outlined,
-                                                size: 14, color: Colors.orange.shade800),
+                                            Icon(
+                                              Icons.timer_outlined,
+                                              size: 14,
+                                              color: Colors.orange.shade800,
+                                            ),
                                             const SizedBox(width: 4),
                                             Text(
                                               'Làm mới sau ${_countdown}s',
@@ -476,9 +560,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                                             ),
                                             const SizedBox(width: 4),
                                             IconButton(
-                                              visualDensity: VisualDensity.compact,
+                                              visualDensity:
+                                                  VisualDensity.compact,
                                               iconSize: 18,
-                                              icon: const Icon(Icons.refresh_rounded),
+                                              icon: const Icon(
+                                                Icons.refresh_rounded,
+                                              ),
                                               onPressed: () => _fetchQr(),
                                             ),
                                           ],

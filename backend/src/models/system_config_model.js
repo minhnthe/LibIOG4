@@ -79,7 +79,7 @@ systemConfigSchema.statics.seedDefaults = async function () {
     },
     {
       config_key: 'WARNING_MINUTES_BEFORE_CLOSE',
-      config_value: '30',
+      config_value: '15',
       data_type: 'INT',
       description: 'Số phút cảnh báo trước khi đóng cửa',
     },
@@ -128,7 +128,7 @@ systemConfigSchema.statics.seedDefaults = async function () {
     },
     {
       config_key: 'warningMinutesBeforeClose',
-      config_value: '30',
+      config_value: '15',
       data_type: 'INT',
       description: 'Alias warningMinutesBeforeClose',
     },

@@ -187,10 +187,27 @@ async function sendForceCheckOutNotification(user, log, staffName = 'Thủ thư'
   });
 }
 
+async function sendClosingSoonNotification(user, closeTime, warningMinutes) {
+  if (!user || !user.device_token) return;
+
+  return sendPushNotification(user.device_token, {
+    title: 'Thư viện sắp đóng cửa',
+    body: `Thư viện sẽ đóng cửa lúc ${closeTime}. Vui lòng chuẩn bị rời thư viện trong ${warningMinutes} phút tới.`,
+    data: {
+      type: 'LIBRARY_CLOSING_ALERT',
+      studentId: user.student_id,
+      closeTime,
+      warningMinutes: String(warningMinutes),
+      timestamp: new Date().toISOString(),
+    },
+  });
+}
+
 module.exports = {
   isFirebaseConfigured,
   sendPushNotification,
   sendCheckInNotification,
   sendCardStatusNotification,
   sendForceCheckOutNotification,
+  sendClosingSoonNotification,
 };

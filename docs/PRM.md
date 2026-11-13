@@ -329,7 +329,7 @@ Hệ thống được thiết kế giao diện theo 3 phân hệ tương ứng v
 | `MAX_CAPACITY`                   | `200`        | INT       | Sức chứa tối đa của thư viện            |
 | `OPEN_TIME`                      | `07:30`      | TIME      | Giờ mở cửa thư viện                     |
 | `CLOSE_TIME`                     | `21:30`      | TIME      | Giờ đóng cửa thư viện                   |
-| `WARNING_MINUTES_BEFORE_CLOSE`   | `30`         | INT       | Số phút cảnh báo trước khi đóng cửa     |
+| `WARNING_MINUTES_BEFORE_CLOSE`   | `15`         | INT       | Số phút cảnh báo trước khi đóng cửa     |
 | `MAX_SESSION_HOURS`              | `8`          | INT       | Số giờ tối đa cho một phiên truy cập    |
 | `ALLOWED_DAYS`                   | `Mon,Tue,Wed,Thu,Fri,Sat` | STRING | Các ngày mở cửa trong tuần       |
 | `MAINTENANCE_MODE`               | `false`      | BOOLEAN   | Trạng thái bảo trì hệ thống            |
